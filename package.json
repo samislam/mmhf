@@ -1,0 +1,34 @@
+{
+  "name": "mmhf",
+  "version": "1.0.0",
+  "description": "MMHF (Mongoose Middleware Handlers Factory) Is a package of Express middlewares to quickly perform the daily CRUD operations, catching the errors internally and sending unified formats of responses to the clients.",
+  "main": "index.js",
+  "scripts": {
+    "test": "nodemon -q index.js"
+  },
+  "keywords": [
+    "express-middleware",
+    "express-middlewares",
+    "expressJS",
+    "expressJs-middlewares",
+    "expressJs-middleware",
+    "factory",
+    "handlersFactory",
+    "handlers-factory",
+    "mmhf",
+    "mongoose-middleware-handlers-factory",
+    "mongoose-middlewares-handlers-factory",
+    "mongoose",
+    "mongoose-handlers",
+    "mongoose-controllers"
+  ],
+  "author": "Islam Yamor",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.18.1",
+    "mongoose": "^6.4.3"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.19"
+  }
+}

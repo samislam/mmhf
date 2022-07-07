@@ -176,7 +176,7 @@ Create one document using the `dataObj` argument, and send the response.
 
 ### Available options:
 
-- **projection:**: (defaults to `null`) the mongoose findOne method arguemnt, optional fields to return, read more (here)[https://mongoosejs.com/docs/api/model.html#model_Model.find].
+- **projection:**: (defaults to `null`) the mongoose findOne method arguemnt, optional fields to return, read more [here](https://mongoosejs.com/docs/api/model.html#model_Model.find).
 - for other options, read the options available in the **available options** section.
 
 Get multiple documents, search for them using the `filterObj` argument, and send them with a `results` property.
@@ -197,7 +197,7 @@ Get multiple documents, search for them using the `filterObj` argument, and send
 
 ### Available options:
 
-- **projection:**: (defaults to `null`) the mongoose findOne method arguemnt, optional fields to return, read more (here)[https://mongoosejs.com/docs/api/model.html#model_Model.find].
+- **projection:**: (defaults to `null`) the mongoose findOne method arguemnt, optional fields to return, read more [here](https://mongoosejs.com/docs/api/model.html#model_Model.find).
 - for other options, read the options available in the **available options** section.
 
 Get one document, search for it using the `filterObj` argument, and send the response.
@@ -217,7 +217,7 @@ Get one document, search for it using the `filterObj` argument, and send the res
 
 ### Available options:
 
-- **projection:**: (defaults to `null`) the mongoose findOne method arguemnt, optional fields to return, read more (here)[https://mongoosejs.com/docs/api/model.html#model_Model.find].
+- **projection:**: (defaults to `null`) the mongoose findOne method arguemnt, optional fields to return, read more [here](https://mongoosejs.com/docs/api/model.html#model_Model.find).
 - for other options, read the options available in the **available options** section.
 
 Get one document, search for it by its ID, and send the response.
@@ -288,7 +288,7 @@ Update one document, search for it using the by its ID, update the specified fie
 ### Available options:
 
 - **sendDeletedDoc:** _boolean_, (default **false**) send the document which got deleted with the response.
-  - **Note:** since the default status code is **204**, you're most likey not going to see the body of the response on the client-side, (for example when you're using (PostMan)[https://www.postman.com/]).
+  - **Note:** since the default status code is **204**, you're most likey not going to see the body of the response on the client-side, (for example when you're using [PostMan](https://www.postman.com/)).
 - see the options available in the **available options** section.
 
 Delete one document, search for it using the `filterObj` argument, and send the response.
@@ -309,7 +309,7 @@ Delete one document, search for it using the `filterObj` argument, and send the 
 ### Available options:
 
 - **sendDeletedDoc:** _boolean_, (default **false**) send the document which got deleted with the response.
-  - **Note:** since the default status code is **204**, you're most likey not going to see the body of the response on the client-side, (for example when you're using (PostMan)[https://www.postman.com/]).
+  - **Note:** since the default status code is **204**, you're most likey not going to see the body of the response on the client-side, (for example when you're using [PostMan](https://www.postman.com/)).
 - see the options available in the **available options** section.
 
 Delete one document, search for it by its ID, and send the response.
@@ -346,9 +346,9 @@ callNext: false, // default value
 statusCode,
 ```
 
-- **sendRes**: _object_, the options you want to pass to the (sendRes)[https://www.npmjs.com/package/@samislam/sendres] module, mmhf defaults to the default configurations of (sendRes)[https://www.npmjs.com/package/@samislam/sendres], if you want to configure how your response styles, use this property.
-  see the available options for this property object on the offical docs of (sendRes)[https://github.com/samislam/sendres#available-options].
-- **queryOptions**: _object_, the options you want to pass down to the query method, these are passed directly down to the mongoose query method which is in use, for instnce, if you're using `factory.getOneById(Model, (req)=> req.params.id, { queryOptions: { strictQuery: false } })`, the `strictQuery: false` you wrote is going to be passed to the inner `Model.findOneById` mongoose method. If you want to see the available options for each query, refer to the official (Mongoose documentation)[https://mongoosejs.com/docs] for this purpose.
+- **sendRes**: _object_, the options you want to pass to the [sendRes](https://www.npmjs.com/package/@samislam/sendres) module, mmhf defaults to the default configurations of [sendRes](https://www.npmjs.com/package/@samislam/sendres), if you want to configure how your response styles, use this property.
+  see the available options for this property object on the offical docs of [sendRes](https://github.com/samislam/sendres#available-options).
+- **queryOptions**: _object_, the options you want to pass down to the query method, these are passed directly down to the mongoose query method which is in use, for instnce, if you're using `factory.getOneById(Model, (req)=> req.params.id, { queryOptions: { strictQuery: false } })`, the `strictQuery: false` you wrote is going to be passed to the inner `Model.findOneById` mongoose method. If you want to see the available options for each query, refer to the official [Mongoose documentation](https://mongoosejs.com/docs) for this purpose.
 - **callNext**: _boolean_, If you have an express middleware that you want to execute after running one of the middlewares, use this option to make the middleware you're using call the express `next()` function internally.
   - **Note:** even if this options was set to **true**, the response will be sent either ways, **and you can't send a response twice**.
 - **statusCode**: _number_, the success status code, refer to the API section to know the default success status code for each middleware.
@@ -372,7 +372,7 @@ For more options, refer to each middleware in the API above to see if any other 
 
 The errors can be one of two types:
 
-1. a mongoose error, such as validation errors, casting errors, or duplicate fields errors, for this you need to read (the official docs of Mongoose)[https://mongoosejs.com/docs/].
+1. a mongoose error, such as validation errors, casting errors, or duplicate fields errors, for this you need to read [the official docs of Mongoose](https://mongoosejs.com/docs/).
 2. an mmhf error, and the only error that mmhf have is the not found error, when it tries to search for a document, then it can't find that document, for this, mmhf automatically handles that and sends a response to the client, thus you don't need to handle that anywhere.
 
 ---

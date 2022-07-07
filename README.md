@@ -146,9 +146,7 @@ The API is pretty simple and stright forward, there are 4 types of middlewares *
 
 ## Creating Middlewares:
 
-```
-factory.createOne(Model: MongooseModel, dataObj: object | function, options: object | function)
-```
+## `createOne(Model: MongooseModel, dataObj: object | function, options: object | function)`
 
 - **Model**: Your Mongoose model.
 - **dataObj**: _object_ | _function_, The data you want to write.
@@ -166,9 +164,7 @@ Create one document using the `dataObj` argument, and send the response.
 
 ## Reading Middlewares:
 
-```
-factory.getMany(Model: MongooseModel, filterObj: object | function, options: object | function)
-```
+## `getMany(Model: MongooseModel, filterObj: object | function, options: object | function)`
 
 - **Model**: Your Mongoose model.
 - **filterObj**: _object_ | _function_, The search filter you use to find the documents.
@@ -189,9 +185,7 @@ Get multiple documents, search for them using the `filterObj` argument, and send
 - internally uses the Mongoose method `Model.find()`.
 - operation success status code: **200**.
 
-```
-factory.getOne(Model: MongooseModel, filterObj: object | function, options: object | function)
-```
+## `getOne(Model: MongooseModel, filterObj: object | function, options: object | function)`
 
 - **Model**: Your Mongoose model.
 - **filterObj**: _object_ | _function_, The search filter you use to find the document.
@@ -211,9 +205,7 @@ Get one document, search for it using the `filterObj` argument, and send the res
 - internally uses the Mongoose method `Model.findOne()`.
 - operation success status code: **200**.
 
-```
-factory.getOneById(Model: MongooseModel, id: ObjectId | string | function, options: object | function)
-```
+## `getOneById(Model: MongooseModel, id: ObjectId | string | function, options: object | function)`
 
 - **Model**: Your Mongoose model.
 - **id**: _ObjectId_ | _string_ | _function_, The ID of the document.
@@ -235,9 +227,7 @@ Get one document, search for it by its ID, and send the response.
 
 ## Updating Middlewares:
 
-```
-factory.updateOne(Model: MongooseModel, filterObj: object | function, updateObj: object | function, options: object | function)
-```
+## `updateOne(Model: MongooseModel, filterObj: object | function, updateObj: object | function, options: object | function)`
 
 - **Model**: Your Mongoose model.
 - **filterObj**: _object_ | _function_, The search filter you use to find the document.
@@ -260,9 +250,7 @@ Update one document, search for it using the `filterObj` argument, update the sp
 - Internally uses the Mongoose method `Model.findOneAndUpdate()`.
 - operation success status code: **200**.
 
-```
-factory.updateOneById(Model: MongooseModel, id: ObjectId | string | function, updateObj: object | function, options: object | function)
-```
+## `updateOneById(Model: MongooseModel, id: ObjectId | string | function, updateObj: object | function, options: object | function)`
 
 - **Model**: Your Mongoose model.
 - **id**: _ObjectId_ | _string_ | _function_, The ID of the document.
@@ -287,9 +275,7 @@ Update one document, search for it using the by its ID, update the specified fie
 
 ## Deleting Middlewares:
 
-```
-factory.deleteOne(Model: MongooseModel, filterObj: object | function, options: object | function)
-```
+## `deleteOne(Model: MongooseModel, filterObj: object | function, options: object | function)`
 
 - **Model**: Your Mongoose model.
 - **filterObj**: _object_ | _function_, The search filter you use to find the document.
@@ -310,9 +296,7 @@ Delete one document, search for it using the `filterObj` argument, and send the 
 - Internally uses the Mongoose method `Model.findOneAndDelete()`.
 - operation success status code: **204**.
 
-```
-factory.deleteOneById(Model: MongooseModel, id: ObjectId | string | function, options: object | function)
-```
+## `deleteOneById(Model: MongooseModel, id: ObjectId | string | function, options: object | function)`
 
 - **Model**: Your Mongoose model.
 - **id**: _ObjectId_ | _string_ | _function_, The ID of the document.
@@ -333,24 +317,21 @@ Delete one document, search for it by its ID, and send the response.
 - Internally uses the Mongoose method `Model.findByIdAndDelete()`.
 - operation success status code: **204**.
 
-```
-factory.archiveOne(Model: MongooseModel, filterObj: object | function, options: object | function)
-```
+## `archiveOne(Model: MongooseModel, filterObj: object | function, options: object | function)`
+
 > - 🧪 This middleware is here for experimental purposes only, and it might get removed at any time.
 > - ⚠️ Don't use this middleware, as it's not guarnteed, you've been warned.
 
-Soft delete a document by setting a _archived property on the document with the current timestamp indicating the time of archiving, when this property is set, you should filter any find query using mongoose to search only for the documents that don't have the _archive property. 
+Soft delete a document by setting a \_archived property on the document with the current timestamp indicating the time of archiving, when this property is set, you should filter any find query using mongoose to search only for the documents that don't have the \_archive property.
 
 - operation success status code: **204**.
 
-```
-factory.archiveOneById(Model: MongooseModel, id: ObjectId | string | function, options: object | function)
-```
+## `archiveOneById(Model: MongooseModel, id: ObjectId | string | function, options: object | function)`
+
 > - 🧪 This middleware is here for experimental purposes only, and it might get removed at any time.
 > - ⚠️ Don't use this middleware, as it's not guarnteed, you've been warned.
 
-
-Soft delete a document by setting a _archived property on the document with the current timestamp indicating the time of archiving, when this property is set, you should filter any find query using mongoose to search only for the documents that don't have the _archive property. 
+Soft delete a document by setting a \_archived property on the document with the current timestamp indicating the time of archiving, when this property is set, you should filter any find query using mongoose to search only for the documents that don't have the \_archive property.
 
 - operation success status code: **204**.
 

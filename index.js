@@ -5,19 +5,18 @@ const { sendRes } = require('@samislam/sendres')
 const expressAsyncHandler = require('express-async-handler')
 const checkTypes = require('@samislam/checktypes')
 const _ = require('lodash')
-const log = require('@samislam/log')
-
 // -----
-const AppError = require('../../utils/AppError')
-const archiveDoc = require('../../utils/archiveDoc')
+const archiveDoc = require('./archiveDoc')
 
 /*=====  End of importing dependencies  ======*/
 
-const getValue = (parameter, ...args) => {
-  console.log(parameter)
-  return checkTypes.isAsycOrSyncFunc(parameter) ? parameter(...args) : parameter
-}
+const getValue = (parameter, ...args) => (checkTypes.isAsycOrSyncFunc(parameter) ? parameter(...args) : parameter)
+
 const notFoundDefaultMsg = 'No record found with that ID'
+
+function sendErr(res, statusCode, message) {
+  sendRes(statusCode, res, { message })
+}
 
 /*=============================================
 =            Creating Middlewares            =
@@ -25,25 +24,24 @@ const notFoundDefaultMsg = 'No record found with that ID'
 
 const createOne = (Model, dataObj, options) =>
   expressAsyncHandler(async (req, res, next) => {
-    log.w(log.label, dataObj)
     // @param Model: MongooseModel
     // @param dataObj: object | function
     // @param options: object | function
     // getting the parameters values ---------------
-    dataObj = getValue(dataObj, req)
-    options = getValue(options, req)
+    const dataObjValue = getValue(dataObj, req)
+    const optionsValue = getValue(options, req)
     // working with the options ---------------
     const chosenOptions = {}
     const defaultOptions = {
       sendRes: {},
       queryOptions: {},
       callNext: false,
+      statusCode: 201,
     }
-    _.merge(chosenOptions, defaultOptions, options)
+    _.merge(chosenOptions, defaultOptions, optionsValue)
 
-    console.log(dataObj)
-    const doc = await Model.create(dataObj)
-    sendRes(201, res, { data: doc }, chosenOptions.sendRes)
+    const doc = await Model.create(dataObjValue)
+    sendRes(chosenOptions.statusCode, res, { data: doc }, chosenOptions.sendRes)
     if (chosenOptions.callNext) next()
   })
 
@@ -57,8 +55,8 @@ const getMany = (Model, filterObj = {}, options) =>
     // @param filterObj: object | function
     // @param options: object | function
     // getting the parameters values ---------------
-    filterObj = await getValue(filterObj, req)
-    options = await getValue(options, req)
+    const filterObjValue = await getValue(filterObj, req)
+    const optionsValue = await getValue(options, req)
     // working with the options ---------------
     const chosenOptions = {}
     const defaultOptions = {
@@ -66,11 +64,12 @@ const getMany = (Model, filterObj = {}, options) =>
       queryOptions: {},
       callNext: false,
       projection: null,
+      statusCode: 200,
     }
-    _.merge(chosenOptions, defaultOptions, options)
+    _.merge(chosenOptions, defaultOptions, optionsValue)
 
-    const docs = await Model.find(filterObj, chosenOptions.projection, chosenOptions.queryOptions)
-    sendRes(200, res, { $$data: docs }, chosenOptions.sendRes)
+    const docs = await Model.find(filterObjValue, chosenOptions.projection, chosenOptions.queryOptions)
+    sendRes(chosenOptions.statusCode, res, { $$data: docs }, chosenOptions.sendRes)
     if (chosenOptions.callNext) next()
   })
 
@@ -80,8 +79,8 @@ const getOne = (Model, filterObj, options) =>
     // @param filterObj: object | function
     // @param options: object | function
     // getting the parameters values ---------------
-    filterObj = await getValue(filterObj, req)
-    options = await getValue(options, req)
+    const filterObjValue = await getValue(filterObj, req)
+    const optionsValue = await getValue(options, req)
     // working with the options ---------------
     const chosenOptions = {}
     const defaultOptions = {
@@ -89,14 +88,15 @@ const getOne = (Model, filterObj, options) =>
       queryOptions: {},
       callNext: false,
       projection: null,
+      statusCode: 200,
       notFoundMsg: notFoundDefaultMsg,
       notFoundErr: true,
     }
-    _.merge(chosenOptions, defaultOptions, options)
+    _.merge(chosenOptions, defaultOptions, optionsValue)
 
-    const doc = await Model.findOne(filterObj, chosenOptions.projection, chosenOptions.queryOptions)
-    if (chosenOptions.notFoundErr && !doc) return next(new AppError(chosenOptions.notFoundMsg, 404))
-    sendRes(200, res, { data: doc }, chosenOptions.sendRes)
+    const doc = await Model.findOne(filterObjValue, chosenOptions.projection, chosenOptions.queryOptions)
+    if (chosenOptions.notFoundErr && !doc) return sendErr(res, 404, chosenOptions.notFoundMsg)
+    sendRes(chosenOptions.statusCode, res, { data: doc }, chosenOptions.sendRes)
     if (chosenOptions.callNext) next()
   })
 const getOneById = (Model, id, options) =>
@@ -105,8 +105,8 @@ const getOneById = (Model, id, options) =>
     // @param id: ObjectId | string | function
     // @param options: object | function
     // getting the parameters values ---------------
-    id = await getValue(id, req)
-    options = await getValue(options, req)
+    const idValue = await getValue(id, req)
+    const optionsValue = await getValue(options, req)
     // working with the options ---------------
     const chosenOptions = {}
     const defaultOptions = {
@@ -114,14 +114,15 @@ const getOneById = (Model, id, options) =>
       queryOptions: {},
       callNext: false,
       projection: null,
+      statusCode: 200,
       notFoundMsg: notFoundDefaultMsg,
       notFoundErr: true,
     }
-    _.merge(chosenOptions, defaultOptions, options)
+    _.merge(chosenOptions, defaultOptions, optionsValue)
 
-    const doc = await Model.findById(id, chosenOptions.projection, chosenOptions.queryOptions)
-    if (chosenOptions.notFoundErr && !doc) return next(new AppError(chosenOptions.notFoundMsg, 404))
-    sendRes(200, res, { data: doc }, chosenOptions.sendRes)
+    const doc = await Model.findById(idValue, chosenOptions.projection, chosenOptions.queryOptions)
+    if (chosenOptions.notFoundErr && !doc) return sendErr(res, 404, chosenOptions.notFoundMsg)
+    sendRes(chosenOptions.statusCode, res, { data: doc }, chosenOptions.sendRes)
     if (chosenOptions.callNext) next()
   })
 
@@ -136,23 +137,24 @@ const updateOne = (Model, filterObj, updateObj, options) =>
     // @param updateObj: object | function
     // @param options: object | function
     // getting the parameters values ---------------
-    filterObj = await getValue(filterObj, req)
-    updateObj = await getValue(updateObj, req)
-    options = await getValue(options, req)
+    const filterObjValue = await getValue(filterObj, req)
+    const updateObjValue = await getValue(updateObj, req)
+    const optionsValue = await getValue(options, req)
     // working with the options ---------------
     const chosenOptions = {}
     const defaultOptions = {
       sendRes: {},
       queryOptions: { new: true, runValidators: true },
       callNext: false,
+      statusCode: 200,
       notFoundMsg: notFoundDefaultMsg,
       notFoundErr: true,
     }
-    _.merge(chosenOptions, defaultOptions, options)
+    _.merge(chosenOptions, defaultOptions, optionsValue)
 
-    const doc = await Model.findOneAndUpdate(filterObj, updateObj, chosenOptions.queryOptions)
-    if (chosenOptions.notFoundErr && !doc) return next(new AppError(chosenOptions.notFoundMsg, 404))
-    sendRes(200, res, { data: doc }, chosenOptions.sendRes)
+    const doc = await Model.findOneAndUpdate(filterObjValue, updateObjValue, chosenOptions.queryOptions)
+    if (chosenOptions.notFoundErr && !doc) return sendErr(res, 404, chosenOptions.notFoundMsg)
+    sendRes(chosenOptions.statusCode, res, { data: doc }, chosenOptions.sendRes)
     if (chosenOptions.callNext) next()
   })
 
@@ -163,23 +165,24 @@ const updateOneById = (Model, id, updateObj, options) =>
     // @param updateObj: object | function
     // @param options: object | function
     // getting the parameters values ---------------
-    id = await getValue(id, req)
-    updateObj = await getValue(updateObj, req)
-    options = await getValue(options, req)
+    const idValue = await getValue(id, req)
+    const updateObjValue = await getValue(updateObj, req)
+    const optionsValue = await getValue(options, req)
     // working with the options ---------------
     const chosenOptions = {}
     const defaultOptions = {
       sendRes: {},
       queryOptions: { new: true, runValidators: true },
       callNext: false,
+      statusCode: 200,
       notFoundMsg: notFoundDefaultMsg,
       notFoundErr: true,
     }
-    _.merge(chosenOptions, defaultOptions, options)
+    _.merge(chosenOptions, defaultOptions, optionsValue)
 
-    const doc = await Model.findByIdAndUpdate(id, updateObj, chosenOptions.queryOptions)
-    if (chosenOptions.notFoundErr && !doc) return next(new AppError(chosenOptions.notFoundMsg, 404))
-    sendRes(200, res, { data: doc }, chosenOptions.sendRes)
+    const doc = await Model.findByIdAndUpdate(idValue, updateObjValue, chosenOptions.queryOptions)
+    if (chosenOptions.notFoundErr && !doc) return sendErr(res, 404, chosenOptions.notFoundMsg)
+    sendRes(chosenOptions.statusCode, res, { data: doc }, chosenOptions.sendRes)
     if (chosenOptions.callNext) next()
   })
 
@@ -193,23 +196,24 @@ const deleteOne = (Model, filterObj, options) =>
     // @param filterObj: object | function
     // @param options: object | function
     // getting the parameters values ---------------
-    filterObj = await getValue(filterObj, req)
-    options = await getValue(options, req)
+    const filterObjValue = await getValue(filterObj, req)
+    const optionsValue = await getValue(options, req)
     // working with the options ---------------
     const chosenOptions = {}
     const defaultOptions = {
       sendRes: {},
       queryOptions: {},
       callNext: false,
+      statusCode: 204,
       notFoundMsg: notFoundDefaultMsg,
       notFoundErr: true,
       sendDeletedDoc: false,
     }
-    _.merge(chosenOptions, defaultOptions, options)
+    _.merge(chosenOptions, defaultOptions, optionsValue)
 
-    const doc = await Model.findOneAndDelete(filterObj, chosenOptions.queryOptions)
-    if (chosenOptions.notFoundErr && !doc) return next(new AppError(chosenOptions.notFoundMsg, 404))
-    sendRes(204, res, { data: chosenOptions.sendDeletedDoc ? doc : null }, chosenOptions.sendRes)
+    const doc = await Model.findOneAndDelete(filterObjValue, chosenOptions.queryOptions)
+    if (chosenOptions.notFoundErr && !doc) return sendErr(res, 404, chosenOptions.notFoundMsg)
+    sendRes(chosenOptions.statusCode, res, { data: chosenOptions.sendDeletedDoc ? doc : null }, chosenOptions.sendRes)
     if (chosenOptions.callNext) next()
   })
 const deleteOneById = (Model, id, options) =>
@@ -218,23 +222,24 @@ const deleteOneById = (Model, id, options) =>
     // @param id: ObjectId | string | function
     // @param options: object | function
     // getting the parameters values ---------------
-    id = await getValue(id, req)
-    options = await getValue(options, req)
+    const idValue = await getValue(id, req)
+    const optionsValue = await getValue(options, req)
     // working with the options ---------------
     const chosenOptions = {}
     const defaultOptions = {
       sendRes: {},
       queryOptions: {},
       callNext: false,
+      statusCode: 204,
       notFoundMsg: notFoundDefaultMsg,
       notFoundErr: true,
       sendDeletedDoc: false,
     }
-    _.merge(chosenOptions, defaultOptions, options)
+    _.merge(chosenOptions, defaultOptions, optionsValue)
 
-    const doc = await Model.findByIdAndDelete(id, chosenOptions.queryOptions)
-    if (chosenOptions.notFoundErr && !doc) return next(new AppError(chosenOptions.notFoundMsg, 404))
-    sendRes(204, res, { data: chosenOptions.sendDeletedDoc ? doc : null }, chosenOptions.sendRes)
+    const doc = await Model.findByIdAndDelete(idValue, chosenOptions.queryOptions)
+    if (chosenOptions.notFoundErr && !doc) return sendErr(res, 404, chosenOptions.notFoundMsg)
+    sendRes(chosenOptions.statusCode, res, { data: chosenOptions.sendDeletedDoc ? doc : null }, chosenOptions.sendRes)
     if (chosenOptions.callNext) next()
   })
 const archiveOne = (Model, filterObj, options) =>
@@ -243,24 +248,28 @@ const archiveOne = (Model, filterObj, options) =>
     // @param filterObj: object | function
     // @param options: object | function
     // getting the parameters values ---------------
-    filterObj = await getValue(filterObj, req)
-    options = await getValue(options, req)
+    const filterObjValue = await getValue(filterObj, req)
+    const optionsValue = await getValue(options, req)
     // working with the options ---------------
     const chosenOptions = {}
     const defaultOptions = {
       sendRes: {},
       queryOptions: {},
       callNext: false,
+      statusCode: 204,
       notFoundMsg: notFoundDefaultMsg,
       notFoundErr: true,
       sendArchivedDoc: false,
     }
-    _.merge(chosenOptions, defaultOptions, options)
+    _.merge(chosenOptions, defaultOptions, optionsValue)
 
-    const doc = await archiveDoc(Model, filterObj, { ...chosenOptions.queryOptions, notFoundErr: false })
-    if (chosenOptions.notFoundErr && !doc) return next(new AppError(chosenOptions.notFoundMsg, 404))
+    const doc = await archiveDoc(Model, filterObjValue, {
+      ...chosenOptions.queryOptions,
+      notFoundErr: false,
+    })
+    if (chosenOptions.notFoundErr && !doc) return sendErr(res, 404, chosenOptions.notFoundMsg)
 
-    sendRes(204, res, { data: chosenOptions.sendArchivedDoc ? doc : null }, chosenOptions.sendRes)
+    sendRes(chosenOptions.statusCode, res, { data: chosenOptions.sendArchivedDoc ? doc : null }, chosenOptions.sendRes)
     if (chosenOptions.callNext) next()
   })
 const archiveOneById = (Model, id, options) =>
@@ -269,23 +278,24 @@ const archiveOneById = (Model, id, options) =>
     // @param id: ObjectId | string | function
     // @param options: object | function
     // getting the parameters values ---------------
-    id = await getValue(id, req)
-    options = await getValue(options, req)
+    const idValue = await getValue(id, req)
+    const optionsValue = await getValue(options, req)
     // working with the options ---------------
     const chosenOptions = {}
     const defaultOptions = {
       sendRes: {},
       queryOptions: {},
       callNext: false,
+      statusCode: 204,
       notFoundMsg: notFoundDefaultMsg,
       notFoundErr: true,
       sendArchivedDoc: false,
     }
-    _.merge(chosenOptions, defaultOptions, options)
+    _.merge(chosenOptions, defaultOptions, optionsValue)
 
     const doc = await archiveDoc(
       Model,
-      { _id: id },
+      { _id: idValue },
       {
         queryOptions: chosenOptions.queryOptions,
         uniqueId: chosenOptions.uniqueId,
@@ -293,9 +303,9 @@ const archiveOneById = (Model, id, options) =>
         notFoundErr: false,
       }
     )
-    if (chosenOptions.notFoundErr && !doc) return next(new AppError(chosenOptions.notFoundMsg, 404))
+    if (chosenOptions.notFoundErr && !doc) return sendErr(res, 404, chosenOptions.notFoundMsg)
 
-    sendRes(204, res, { data: chosenOptions.sendArchivedDoc ? doc : null }, chosenOptions.sendRes)
+    sendRes(chosenOptions.statusCode, res, { data: chosenOptions.sendArchivedDoc ? doc : null }, chosenOptions.sendRes)
     if (chosenOptions.callNext) next()
   })
 

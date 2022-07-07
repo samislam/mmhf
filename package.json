@@ -6,6 +6,10 @@
   "scripts": {
     "test": "nodemon -q ./tests/index.js"
   },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/samislam/mmhf.git"
+  },
   "keywords": [
     "express-middleware",
     "express-middlewares",
@@ -23,6 +27,10 @@
     "mongoose-controllers"
   ],
   "author": "Islam Yamor",
+  "bugs": {
+    "url": "https://github.com/samislam/mmhf/issues"
+  },
+  "homepage": "https://github.com/samislam/mmhf#readme",
   "license": "ISC",
   "dependencies": {
     "@samislam/checktypes": "^1.0.1",

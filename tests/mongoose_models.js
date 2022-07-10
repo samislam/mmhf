@@ -5,12 +5,23 @@ const mongoose = require('mongoose')
 
 /*=====  End of importing dependencies  ======*/
 
+const loginAttempt = new mongoose.Schema({
+  ip: {
+    type: String,
+    required: [true, 'a login attempt must have an IP address'],
+  },
+})
+
 const userSchema = new mongoose.Schema({
   name: {
     type: String,
     required: [true, 'a user must have a name'],
   },
-  password: String,
+  loginAttempts: [loginAttempt],
+  permissions: {
+    nestedName: String,
+    loginAttempts: Array,
+  },
 })
 
 const UserModel = mongoose.model('User', userSchema, 'users')

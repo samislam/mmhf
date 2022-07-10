@@ -135,6 +135,8 @@ factory.getOneById(Model, id, options)
 // [U] Update ----
 factory.updateOne(Model, filterObj, updateObj, options)
 factory.updateOneById(Model, id, updateObj, options)
+factory.updateOneWithSave(Model, filterObj, updateObj, options)
+factory.updateOneByIdWithSave(Model, id, updateObj, options)
 // [D] Delete ----
 factory.deleteOne(Model, filterObj, options)
 factory.deleteOneById(Model, id, options)
@@ -271,6 +273,54 @@ Update one document, search for it using the `filterObj` argument, update the sp
 Update one document, search for it using the by its ID, update the specified fields specified in the `updateObj` arguemnt, and send the response.
 
 - Internally uses the Mongoose method `Model.findByIdAndUpdate()`.
+- operation success status code: **200**.
+
+## `updateOneWithSave(Model: MongooseModel, filterObj: object | function, updateObj: object | function, options: object | function)`
+
+- **Model**: Your Mongoose model.
+- **filterObj**: _object_ | _function_, The search filter you use to find the document.
+  - When a function is provided, it will be called with the express **req** object as the first parameter.
+  - If a function is provided, it must return an object.
+- **updateObj**: _object_ | _function_, the data you want to write on the document if found.
+  - When a function is provided, it will be called with the express **req** object as the first parameter.
+  - If a function is provided, it must return an object.
+- **options**: _object_ | _function_
+  - When a function is provided, it will be called with the express **req** object as the first parameter.
+  - If a function is provided, it must return an object.
+
+### Available options:
+
+- `saveQueryOptions`: options you want to pass to the Mongoose `Document.save()` method, see the official [Mongoose .save() method docs](https://mongoosejs.com/docs/api/document.html#document_Document-save) for these options.
+- see the options available in the **available options** section.
+
+Update one document, search for it using the `filterObj` argument, update the specified fields specified in the `updateObj` arguemnt, and send the response.
+This method has the benifit of runnin the Mongoose `'save'` hooks/middlewares, it also fires the Mongoose `findOne` middleware because it first searches for the specified document, and then **_merges_** the updates specified in the `updateObj` argument with the original data in the document.
+
+- Internally uses the Mongoose method `Model.findOne()` and `Document.save()`.
+- operation success status code: **200**.
+
+## `updateOneByIdWithSave(Model: MongooseModel, id: ObjectId | string | function, updateObj: object | function, options: object | function)`
+
+- **Model**: Your Mongoose model.
+- **id**: _ObjectId_ | _string_ | _function_, The ID of the document.
+  - When a function is provided, it will be called with the express **req** object as the first parameter.
+  - If a function is provided, it must return an object.
+- **updateObj**: _object_ | _function_, the data you want to write on the document if found.
+  - When a function is provided, it will be called with the express **req** object as the first parameter.
+  - If a function is provided, it must return an object.
+- **options**: _object_ | _function_
+  - When a function is provided, it will be called with the express **req** object as the first parameter.
+  - If a function is provided, it must return an object.
+
+### Available options:
+
+- `saveQueryOptions`: options you want to pass to the Mongoose `Document.save()` method, see the official [Mongoose .save() method docs](https://mongoosejs.com/docs/api/document.html#document_Document-save) for these options.
+- see the options available in the **available options** section.
+
+Update one document, search for it using the `filterObj` argument, update the specified fields specified in the `updateObj` arguemnt, and send the response.
+This method has the benifit of runnin the Mongoose `'save'` hooks/middlewares, it also fires the Mongoose `findOne` middleware because it first searches for the specified document, and then **_merges_** the updates specified in the `updateObj` argument with the original data in the document.
+
+- Internally uses the Mongoose method `Model.findOne()` and `Document.save()`.
 - operation success status code: **200**.
 
 ## Deleting Middlewares:

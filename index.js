@@ -6,9 +6,10 @@ const expressAsyncHandler = require('express-async-handler')
 const checkTypes = require('@samislam/checktypes')
 const _ = require('lodash')
 // -----
-const archiveDoc = require('./archiveDoc')
+const archiveDoc = require('./utils/archiveDoc')
 
 /*=====  End of importing dependencies  ======*/
+const saveUpdate = require('./utils/saveUpdate')
 
 const getValue = (parameter, ...args) => (checkTypes.isAsycOrSyncFunc(parameter) ? parameter(...args) : parameter)
 
@@ -186,6 +187,66 @@ const updateOneById = (Model, id, updateObj, options) =>
     if (chosenOptions.callNext) next()
   })
 
+const updateOneWithSave = (Model, filterObj, updateObj, options) =>
+  expressAsyncHandler(async (req, res, next) => {
+    // @param Model: MongooseModel
+    // @param filterObj: object | function
+    // @param updateObj: object | function
+    // @param options: object | function
+    // getting the parameters values ---------------
+    const filterObjValue = await getValue(filterObj, req)
+    const updateObjValue = await getValue(updateObj, req)
+    const optionsValue = await getValue(options, req)
+    // working with the options ---------------
+    const chosenOptions = {}
+    const defaultOptions = {
+      sendRes: {},
+      queryOptions: {},
+      saveQueryOptions: {},
+      callNext: false,
+      statusCode: 200,
+      notFoundMsg: notFoundDefaultMsg,
+      notFoundErr: true,
+    }
+    _.merge(chosenOptions, defaultOptions, optionsValue)
+
+    const doc = await Model.findOne(filterObjValue, chosenOptions.projection, chosenOptions.queryOptions)
+    if (chosenOptions.notFoundErr && !doc) return sendErr(res, 404, chosenOptions.notFoundMsg)
+    const newDoc = await saveUpdate(doc, updateObjValue, chosenOptions.saveQueryOptions)
+    sendRes(chosenOptions.statusCode, res, { data: newDoc }, chosenOptions.sendRes)
+    if (chosenOptions.callNext) next()
+  })
+
+const updateOneByIdWithSave = (Model, id, updateObj, options) =>
+  expressAsyncHandler(async (req, res, next) => {
+    // @param Model: MongooseModel
+    // @param id: object | function
+    // @param updateObj: object | function
+    // @param options: object | function
+    // getting the parameters values ---------------
+    const idValue = await getValue(id, req)
+    const updateObjValue = await getValue(updateObj, req)
+    const optionsValue = await getValue(options, req)
+    // working with the options ---------------
+    const chosenOptions = {}
+    const defaultOptions = {
+      sendRes: {},
+      queryOptions: {},
+      saveQueryOptions: {},
+      callNext: false,
+      statusCode: 200,
+      notFoundMsg: notFoundDefaultMsg,
+      notFoundErr: true,
+    }
+    _.merge(chosenOptions, defaultOptions, optionsValue)
+
+    const doc = await Model.findById(idValue, chosenOptions.projection, chosenOptions.queryOptions)
+    if (chosenOptions.notFoundErr && !doc) return sendErr(res, 404, chosenOptions.notFoundMsg)
+    const newDoc = await saveUpdate(doc, updateObjValue, chosenOptions.saveQueryOptions)
+    sendRes(chosenOptions.statusCode, res, { data: newDoc }, chosenOptions.sendRes)
+    if (chosenOptions.callNext) next()
+  })
+
 /*=============================================
 =            Deleting Middlewares            =
 =============================================*/
@@ -317,6 +378,8 @@ module.exports = {
   getOneById,
   updateOne,
   updateOneById,
+  updateOneWithSave,
+  updateOneByIdWithSave,
   deleteOne,
   deleteOneById,
   archiveOne,

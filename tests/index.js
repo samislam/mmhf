@@ -24,7 +24,7 @@ app
   .route('/api/users/:id')
   .get(factory.getOneById(UserModel, (req) => req.params.id))
   .patch(
-    factory.updateOneById(
+    factory.updateOneByIdWithSave(
       UserModel,
       (req) => req.params.id,
       (req) => req.body
@@ -35,6 +35,7 @@ app
 // global error handling middleware ---------------:
 app.use((error, req, res, next) => {
   if (error.isOperational) {
+    console.log('operational error!')
     sendRes(error.statusCode, res, { ...error })
   } else sendRes(400, res, error)
 })

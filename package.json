@@ -1,6 +1,6 @@
 {
   "name": "mmhf",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "MMHF (Mongoose Middleware Handlers Factory) Is a package of Express middlewares to quickly perform the daily CRUD operations, catching the errors internally and sending unified formats of responses to the clients.",
   "main": "index.js",
   "scripts": {

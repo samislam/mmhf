@@ -8,7 +8,7 @@
 const express = require('express')
 const UsersModel = require('./modles/UsersModel.js')
 // ----- require mmhf
-const factory = require('@samislam/mmhf')
+const factory = require('mmhf')
 
 const app = express()
 
@@ -53,7 +53,7 @@ When a client requests the endpoint **/api/users** the response would be:
 const express = require('express')
 const UsersModel = require('./modles/UsersModel.js')
 // ----- require mmhf
-const factory = require('@samislam/mmhf')
+const factory = require('mmhf')
 
 const app = express()
 
@@ -88,7 +88,7 @@ When a client requests the endpoint **/api/users/2** the response would be:
 const express = require('express')
 const UsersModel = require('./modles/UsersModel.js')
 // ----- require mmhf
-const factory = require('@samislam/mmhf')
+const factory = require('mmhf')
 
 const app = express()
 
@@ -122,7 +122,7 @@ When a client POSTs the endpoint **/api/users** with the following data, the res
 
 # API
 
-## Qucik overview:
+## Quick overview:
 
 ```js
 // the following are all the available methods: ---------------
@@ -144,7 +144,7 @@ factory.archiveOne(Model, filterObj, options)
 factory.archiveOneById(Model, id, options)
 ```
 
-The API is pretty simple and stright forward, there are 4 types of middlewares **CRUD** [**C**reating middlewares, **R**eading middlewares, **U**pdating middlewares, **D**eleting middlewares].
+The API is pretty straightforward, there are 4 types of middlewares **CRUD** [**C**reating middlewares, **R**eading middlewares, **U**pdating middlewares, **D**eleting middlewares].
 
 ## Creating Middlewares:
 
@@ -247,7 +247,7 @@ Get one document, search for it by its ID, and send the response.
 - **queryOptions:** uses `{ new: true, runValidators: true }` internally by default.
 - see the options available in the **available options** section.
 
-Update one document, search for it using the `filterObj` argument, update the specified fields specified in the `updateObj` arguemnt, and send the response.
+Update one document, search for it using the `filterObj` argument, update the specified fields specified in the `updateObj` argument, and send the response.
 
 - Internally uses the Mongoose method `Model.findOneAndUpdate()`.
 - operation success status code: **200**.
@@ -270,7 +270,7 @@ Update one document, search for it using the `filterObj` argument, update the sp
 - **queryOptions:** uses `{ new: true, runValidators: true }` internally by default.
 - see the options available in the **available options** section.
 
-Update one document, search for it using the by its ID, update the specified fields specified in the `updateObj` arguemnt, and send the response.
+Update one document, search for it using the by its ID, update the specified fields specified in the `updateObj` argument, and send the response.
 
 - Internally uses the Mongoose method `Model.findByIdAndUpdate()`.
 - operation success status code: **200**.
@@ -293,8 +293,8 @@ Update one document, search for it using the by its ID, update the specified fie
 - `saveQueryOptions`: options you want to pass to the Mongoose `Document.save()` method, see the official [Mongoose .save() method docs](https://mongoosejs.com/docs/api/document.html#document_Document-save) for these options.
 - see the options available in the **available options** section.
 
-Update one document, search for it using the `filterObj` argument, update the specified fields specified in the `updateObj` arguemnt, and send the response.
-This method has the benifit of runnin the Mongoose `'save'` hooks/middlewares, it also fires the Mongoose `findOne` middleware because it first searches for the specified document, and then **_merges_** the updates specified in the `updateObj` argument with the original data in the document.
+Update one document, search for it using the `filterObj` argument, update the specified fields specified in the `updateObj` argument, and send the response.
+This method has the benefit of running the Mongoose `'save'` hooks/middlewares, it also fires the Mongoose `findOne` middleware because it first searches for the specified document, and then **_merges_** the updates specified in the `updateObj` argument with the original data in the document.
 
 - Internally uses the Mongoose method `Model.findOne()` and `Document.save()`.
 - operation success status code: **200**.
@@ -317,8 +317,8 @@ This method has the benifit of runnin the Mongoose `'save'` hooks/middlewares, i
 - `saveQueryOptions`: options you want to pass to the Mongoose `Document.save()` method, see the official [Mongoose .save() method docs](https://mongoosejs.com/docs/api/document.html#document_Document-save) for these options.
 - see the options available in the **available options** section.
 
-Update one document, search for it using the `filterObj` argument, update the specified fields specified in the `updateObj` arguemnt, and send the response.
-This method has the benifit of runnin the Mongoose `'save'` hooks/middlewares, it also fires the Mongoose `findOne` middleware because it first searches for the specified document, and then **_merges_** the updates specified in the `updateObj` argument with the original data in the document.
+Update one document, search for it using the `filterObj` argument, update the specified fields specified in the `updateObj` argument, and send the response.
+This method has the benefit of running the Mongoose `'save'` hooks/middlewares, it also fires the Mongoose `findOne` middleware because it first searches for the specified document, and then **_merges_** the updates specified in the `updateObj` argument with the original data in the document.
 
 - Internally uses the Mongoose method `Model.findOne()` and `Document.save()`.
 - operation success status code: **200**.
@@ -338,7 +338,7 @@ This method has the benifit of runnin the Mongoose `'save'` hooks/middlewares, i
 ### Available options:
 
 - **sendDeletedDoc:** _boolean_, (default **false**) send the document which got deleted with the response.
-  - **Note:** since the default status code is **204**, you're most likey not going to see the body of the response on the client-side, (for example when you're using [PostMan](https://www.postman.com/)).
+  - **Note:** since the default status code is **204**, you're most likely not going to see the body of the response on the client-side, (for example when you're using [PostMan](https://www.postman.com/)).
 - see the options available in the **available options** section.
 
 Delete one document, search for it using the `filterObj` argument, and send the response.
@@ -359,7 +359,7 @@ Delete one document, search for it using the `filterObj` argument, and send the 
 ### Available options:
 
 - **sendDeletedDoc:** _boolean_, (default **false**) send the document which got deleted with the response.
-  - **Note:** since the default status code is **204**, you're most likey not going to see the body of the response on the client-side, (for example when you're using [PostMan](https://www.postman.com/)).
+  - **Note:** since the default status code is **204**, you're most likely not going to see the body of the response on the client-side, (for example when you're using [PostMan](https://www.postman.com/)).
 - see the options available in the **available options** section.
 
 Delete one document, search for it by its ID, and send the response.
@@ -370,7 +370,7 @@ Delete one document, search for it by its ID, and send the response.
 ## `archiveOne(Model: MongooseModel, filterObj: object | function, options: object | function)`
 
 > - 🧪 This middleware is here for experimental purposes only, and it might get removed at any time.
-> - ⚠️ Don't use this middleware, as it's not guarnteed, you've been warned.
+> - ⚠️ Don't use this middleware, as it's not guaranteed, you've been warned.
 
 Soft delete a document by setting a \_archived property on the document with the current timestamp indicating the time of archiving, when this property is set, you should filter any find query using mongoose to search only for the documents that don't have the \_archive property.
 
@@ -379,7 +379,7 @@ Soft delete a document by setting a \_archived property on the document with the
 ## `archiveOneById(Model: MongooseModel, id: ObjectId | string | function, options: object | function)`
 
 > - 🧪 This middleware is here for experimental purposes only, and it might get removed at any time.
-> - ⚠️ Don't use this middleware, as it's not guarnteed, you've been warned.
+> - ⚠️ Don't use this middleware, as it's not guaranteed, you've been warned.
 
 Soft delete a document by setting a \_archived property on the document with the current timestamp indicating the time of archiving, when this property is set, you should filter any find query using mongoose to search only for the documents that don't have the \_archive property.
 
@@ -397,10 +397,10 @@ statusCode,
 ```
 
 - **sendRes**: _object_, the options you want to pass to the [sendRes](https://www.npmjs.com/package/@samislam/sendres) module, mmhf defaults to the default configurations of [sendRes](https://www.npmjs.com/package/@samislam/sendres), if you want to configure how your response styles, use this property.
-  see the available options for this property object on the offical docs of [sendRes](https://github.com/samislam/sendres#available-options).
+  see the available options for this property object on the official docs of [sendRes](https://github.com/samislam/sendres#available-options).
 - **queryOptions**: _object_, the options you want to pass down to the query method, these are passed directly down to the mongoose query method which is in use, for instnce, if you're using `factory.getOneById(Model, (req)=> req.params.id, { queryOptions: { strictQuery: false } })`, the `strictQuery: false` you wrote is going to be passed to the inner `Model.findOneById` mongoose method. If you want to see the available options for each query, refer to the official [Mongoose documentation](https://mongoosejs.com/docs) for this purpose.
 - **callNext**: _boolean_, If you have an express middleware that you want to execute after running one of the middlewares, use this option to make the middleware you're using call the express `next()` function internally.
-  - **Note:** even if this options was set to **true**, the response will be sent either ways, **and you can't send a response twice**.
+  - **Note:** even if this option was set to **true**, the response will be sent, either way, **and you can't send a response twice**.
 - **statusCode**: _number_, the success status code, refer to the API section to know the default success status code for each middleware.
 
 all the middlewares **except** [createOne(), getMany()] uses the following options:
@@ -411,8 +411,8 @@ notFoundErr: true, // default value
 ```
 
 - **notFoundErr**: call next with an error if the requested document was not found (default to **true**).
-- **notFoundMsg**: the **message** property the will be in the response if a document was not found.
-  - of course, this option will only have effect if the **notFoundErr** option was **true**.
+- **notFoundMsg**: the **message** property will be in the response if a document was not found.
+  - of course, this option will only have an effect if the **notFoundErr** option was **true**.
 
 For more options, refer to each middleware in the API above to see if any other options are available per each middleware.
 
@@ -423,7 +423,7 @@ For more options, refer to each middleware in the API above to see if any other 
 The errors can be one of two types:
 
 1. a mongoose error, such as validation errors, casting errors, or duplicate fields errors, for this you need to read [the official docs of Mongoose](https://mongoosejs.com/docs/).
-2. an mmhf error, and the only error that mmhf have is the not found error, when it tries to search for a document, then it can't find that document, for this, mmhf automatically handles that and sends a response to the client, thus you don't need to handle that anywhere.
+2. an mmhf error and the only error that mmhf have is the not found error, when it tries to search for a document, then it can't find that document, for this, mmhf automatically handles that and sends a response to the client, thus you don't need to handle that anywhere.
 
 ---
 

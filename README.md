@@ -148,9 +148,11 @@ The API is pretty straightforward, there are 4 types of middlewares **CRUD** [**
 
 ## Creating Middlewares:
 
-## `createOne(Model: MongooseModel, dataObj: object | function, options: object | function)`
+## `createOne(Model: MongooseModel | function, dataObj: object | function, options: object | function)`
 
-- **Model**: Your Mongoose model.
+- **Model**: function | Mongoose model.
+  - When a function is provided, it will be called with the express **req** object as the first parameter.
+  - If a function is provided, it must return a Mongoose Model.
 - **dataObj**: _object_ | _function_, The data you want to write.
   - When a function is provided, it will be called with the express **req** object as the first parameter.
   - If a function is provided, it must return an object.
@@ -166,9 +168,11 @@ Create one document using the `dataObj` argument, and send the response.
 
 ## Reading Middlewares:
 
-## `getMany(Model: MongooseModel, filterObj: object | function, options: object | function)`
+## `getMany(Model: MongooseModel | function, filterObj: object | function, options: object | function)`
 
-- **Model**: Your Mongoose model.
+- **Model**: function | Mongoose model.
+  - When a function is provided, it will be called with the express **req** object as the first parameter.
+  - If a function is provided, it must return a Mongoose Model.
 - **filterObj**: _object_ | _function_, The search filter you use to find the documents.
   - When a function is provided, it will be called with the express **req** object as the first parameter.
   - If a function is provided, it must return an object.
@@ -187,9 +191,11 @@ Get multiple documents, search for them using the `filterObj` argument, and send
 - internally uses the Mongoose method `Model.find()`.
 - operation success status code: **200**.
 
-## `getOne(Model: MongooseModel, filterObj: object | function, options: object | function)`
+## `getOne(Model: MongooseModel | function, filterObj: object | function, options: object | function)`
 
-- **Model**: Your Mongoose model.
+- **Model**: function | Mongoose model.
+  - When a function is provided, it will be called with the express **req** object as the first parameter.
+  - If a function is provided, it must return a Mongoose Model.
 - **filterObj**: _object_ | _function_, The search filter you use to find the document.
   - When a function is provided, it will be called with the express **req** object as the first parameter.
   - If a function is provided, it must return an object.
@@ -207,9 +213,11 @@ Get one document, search for it using the `filterObj` argument, and send the res
 - internally uses the Mongoose method `Model.findOne()`.
 - operation success status code: **200**.
 
-## `getOneById(Model: MongooseModel, id: ObjectId | string | function, options: object | function)`
+## `getOneById(Model: MongooseModel | function, id: ObjectId | string | function, options: object | function)`
 
-- **Model**: Your Mongoose model.
+- **Model**: function | Mongoose model.
+  - When a function is provided, it will be called with the express **req** object as the first parameter.
+  - If a function is provided, it must return a Mongoose Model.
 - **id**: _ObjectId_ | _string_ | _function_, The ID of the document.
   - When a function is provided, it will be called with the express **req** object as the first parameter.
   - If a function is provided, it must return an object.
@@ -229,9 +237,11 @@ Get one document, search for it by its ID, and send the response.
 
 ## Updating Middlewares:
 
-## `updateOne(Model: MongooseModel, filterObj: object | function, updateObj: object | function, options: object | function)`
+## `updateOne(Model: MongooseModel | function, filterObj: object | function, updateObj: object | function, options: object | function)`
 
-- **Model**: Your Mongoose model.
+- **Model**: function | Mongoose model.
+  - When a function is provided, it will be called with the express **req** object as the first parameter.
+  - If a function is provided, it must return a Mongoose Model.
 - **filterObj**: _object_ | _function_, The search filter you use to find the document.
   - When a function is provided, it will be called with the express **req** object as the first parameter.
   - If a function is provided, it must return an object.
@@ -252,9 +262,11 @@ Update one document, search for it using the `filterObj` argument, update the sp
 - Internally uses the Mongoose method `Model.findOneAndUpdate()`.
 - operation success status code: **200**.
 
-## `updateOneById(Model: MongooseModel, id: ObjectId | string | function, updateObj: object | function, options: object | function)`
+## `updateOneById(Model: MongooseModel | function, id: ObjectId | string | function, updateObj: object | function, options: object | function)`
 
-- **Model**: Your Mongoose model.
+- **Model**: function | Mongoose model.
+  - When a function is provided, it will be called with the express **req** object as the first parameter.
+  - If a function is provided, it must return a Mongoose Model.
 - **id**: _ObjectId_ | _string_ | _function_, The ID of the document.
   - When a function is provided, it will be called with the express **req** object as the first parameter.
   - If a function is provided, it must return an object.
@@ -275,9 +287,11 @@ Update one document, search for it using the by its ID, update the specified fie
 - Internally uses the Mongoose method `Model.findByIdAndUpdate()`.
 - operation success status code: **200**.
 
-## `updateOneWithSave(Model: MongooseModel, filterObj: object | function, updateObj: object | function, options: object | function)`
+## `updateOneWithSave(Model: MongooseModel | function, filterObj: object | function, updateObj: object | function, options: object | function)`
 
-- **Model**: Your Mongoose model.
+- **Model**: function | Mongoose model.
+  - When a function is provided, it will be called with the express **req** object as the first parameter.
+  - If a function is provided, it must return a Mongoose Model.
 - **filterObj**: _object_ | _function_, The search filter you use to find the document.
   - When a function is provided, it will be called with the express **req** object as the first parameter.
   - If a function is provided, it must return an object.
@@ -299,9 +313,11 @@ This method has the benefit of running the Mongoose `'save'` hooks/middlewares, 
 - Internally uses the Mongoose method `Model.findOne()` and `Document.save()`.
 - operation success status code: **200**.
 
-## `updateOneByIdWithSave(Model: MongooseModel, id: ObjectId | string | function, updateObj: object | function, options: object | function)`
+## `updateOneByIdWithSave(Model: MongooseModel | function, id: ObjectId | string | function, updateObj: object | function, options: object | function)`
 
-- **Model**: Your Mongoose model.
+- **Model**: function | Mongoose model.
+  - When a function is provided, it will be called with the express **req** object as the first parameter.
+  - If a function is provided, it must return a Mongoose Model.
 - **id**: _ObjectId_ | _string_ | _function_, The ID of the document.
   - When a function is provided, it will be called with the express **req** object as the first parameter.
   - If a function is provided, it must return an object.
@@ -325,9 +341,11 @@ This method has the benefit of running the Mongoose `'save'` hooks/middlewares, 
 
 ## Deleting Middlewares:
 
-## `deleteOne(Model: MongooseModel, filterObj: object | function, options: object | function)`
+## `deleteOne(Model: MongooseModel | function, filterObj: object | function, options: object | function)`
 
-- **Model**: Your Mongoose model.
+- **Model**: function | Mongoose model.
+  - When a function is provided, it will be called with the express **req** object as the first parameter.
+  - If a function is provided, it must return a Mongoose Model.
 - **filterObj**: _object_ | _function_, The search filter you use to find the document.
   - When a function is provided, it will be called with the express **req** object as the first parameter.
   - If a function is provided, it must return an object.
@@ -346,9 +364,11 @@ Delete one document, search for it using the `filterObj` argument, and send the 
 - Internally uses the Mongoose method `Model.findOneAndDelete()`.
 - operation success status code: **204**.
 
-## `deleteOneById(Model: MongooseModel, id: ObjectId | string | function, options: object | function)`
+## `deleteOneById(Model: MongooseModel | function, id: ObjectId | string | function, options: object | function)`
 
-- **Model**: Your Mongoose model.
+- **Model**: function | Mongoose model.
+  - When a function is provided, it will be called with the express **req** object as the first parameter.
+  - If a function is provided, it must return a Mongoose Model.
 - **id**: _ObjectId_ | _string_ | _function_, The ID of the document.
   - When a function is provided, it will be called with the express **req** object as the first parameter.
   - If a function is provided, it must return an object.
@@ -367,7 +387,7 @@ Delete one document, search for it by its ID, and send the response.
 - Internally uses the Mongoose method `Model.findByIdAndDelete()`.
 - operation success status code: **204**.
 
-## `archiveOne(Model: MongooseModel, filterObj: object | function, options: object | function)`
+## `archiveOne(Model: MongooseModel | function, filterObj: object | function, options: object | function)`
 
 > - 🧪 This middleware is here for experimental purposes only, and it might get removed at any time.
 > - ⚠️ Don't use this middleware, as it's not guaranteed, you've been warned.
@@ -376,7 +396,7 @@ Soft delete a document by setting a \_archived property on the document with the
 
 - operation success status code: **204**.
 
-## `archiveOneById(Model: MongooseModel, id: ObjectId | string | function, options: object | function)`
+## `archiveOneById(Model: MongooseModel | function, id: ObjectId | string | function, options: object | function)`
 
 > - 🧪 This middleware is here for experimental purposes only, and it might get removed at any time.
 > - ⚠️ Don't use this middleware, as it's not guaranteed, you've been warned.

@@ -1,17 +1,19 @@
 /*=============================================
 =            importing dependencies            =
 =============================================*/
-const { sendRes } = require('@samislam/sendres')
-const expressAsyncHandler = require('express-async-handler')
-const checkTypes = require('@samislam/checktypes')
+const mongoose = require('mongoose')
 const _ = require('lodash')
-// -----
+const { sendRes } = require('@samislam/sendres')
+const checkTypes = require('@samislam/checktypes')
+const expressAsyncHandler = require('express-async-handler')
 const archiveDoc = require('./utils/archiveDoc')
-
-/*=====  End of importing dependencies  ======*/
 const saveUpdate = require('./utils/saveUpdate')
+/*=====  End of importing dependencies  ======*/
 
-const getValue = (parameter, ...args) => (checkTypes.isAsycOrSyncFunc(parameter) ? parameter(...args) : parameter)
+const getValue = async (parameter, ...args) => {
+  if ((parameter && Object.getPrototypeOf(parameter) === mongoose.Model) || !checkTypes.isAsycOrSyncFunc(parameter)) return parameter
+  else return await parameter(...args)
+}
 
 const notFoundDefaultMsg = 'No record found with that ID'
 
@@ -25,12 +27,13 @@ function sendErr(res, statusCode, message) {
 
 const createOne = (Model, dataObj, options) =>
   expressAsyncHandler(async (req, res, next) => {
-    // @param Model: MongooseModel
+    // @param Model: MongooseModel | function
     // @param dataObj: object | function
     // @param options: object | function
     // getting the parameters values ---------------
-    const dataObjValue = getValue(dataObj, req)
-    const optionsValue = getValue(options, req)
+    const ModelValue = await getValue(Model, req)
+    const dataObjValue = await getValue(dataObj, req)
+    const optionsValue = await getValue(options, req)
     // working with the options ---------------
     const chosenOptions = {}
     const defaultOptions = {
@@ -41,7 +44,7 @@ const createOne = (Model, dataObj, options) =>
     }
     _.merge(chosenOptions, defaultOptions, optionsValue)
 
-    const doc = await Model.create(dataObjValue)
+    const doc = await ModelValue.create(dataObjValue)
     sendRes(chosenOptions.statusCode, res, { data: doc }, chosenOptions.sendRes)
     if (chosenOptions.callNext) next()
   })
@@ -52,10 +55,11 @@ const createOne = (Model, dataObj, options) =>
 
 const getMany = (Model, filterObj = {}, options) =>
   expressAsyncHandler(async (req, res, next) => {
-    // @param Model: MongooseModel
+    // @param Model: MongooseModel | function
     // @param filterObj: object | function
     // @param options: object | function
     // getting the parameters values ---------------
+    const ModelValue = await getValue(Model, req)
     const filterObjValue = await getValue(filterObj, req)
     const optionsValue = await getValue(options, req)
     // working with the options ---------------
@@ -69,17 +73,18 @@ const getMany = (Model, filterObj = {}, options) =>
     }
     _.merge(chosenOptions, defaultOptions, optionsValue)
 
-    const docs = await Model.find(filterObjValue, chosenOptions.projection, chosenOptions.queryOptions)
+    const docs = await ModelValue.find(filterObjValue, chosenOptions.projection, chosenOptions.queryOptions)
     sendRes(chosenOptions.statusCode, res, { $$data: docs }, chosenOptions.sendRes)
     if (chosenOptions.callNext) next()
   })
 
 const getOne = (Model, filterObj, options) =>
   expressAsyncHandler(async (req, res, next) => {
-    // @param Model: MongooseModel
+    // @param Model: MongooseModel | function
     // @param filterObj: object | function
     // @param options: object | function
     // getting the parameters values ---------------
+    const ModelValue = await getValue(Model, req)
     const filterObjValue = await getValue(filterObj, req)
     const optionsValue = await getValue(options, req)
     // working with the options ---------------
@@ -95,17 +100,18 @@ const getOne = (Model, filterObj, options) =>
     }
     _.merge(chosenOptions, defaultOptions, optionsValue)
 
-    const doc = await Model.findOne(filterObjValue, chosenOptions.projection, chosenOptions.queryOptions)
+    const doc = await ModelValue.findOne(filterObjValue, chosenOptions.projection, chosenOptions.queryOptions)
     if (chosenOptions.notFoundErr && !doc) return sendErr(res, 404, chosenOptions.notFoundMsg)
     sendRes(chosenOptions.statusCode, res, { data: doc }, chosenOptions.sendRes)
     if (chosenOptions.callNext) next()
   })
 const getOneById = (Model, id, options) =>
   expressAsyncHandler(async (req, res, next) => {
-    // @param Model: MongooseModel
+    // @param Model: MongooseModel | function
     // @param id: ObjectId | string | function
     // @param options: object | function
     // getting the parameters values ---------------
+    const ModelValue = await getValue(Model, req)
     const idValue = await getValue(id, req)
     const optionsValue = await getValue(options, req)
     // working with the options ---------------
@@ -121,7 +127,7 @@ const getOneById = (Model, id, options) =>
     }
     _.merge(chosenOptions, defaultOptions, optionsValue)
 
-    const doc = await Model.findById(idValue, chosenOptions.projection, chosenOptions.queryOptions)
+    const doc = await ModelValue.findById(idValue, chosenOptions.projection, chosenOptions.queryOptions)
     if (chosenOptions.notFoundErr && !doc) return sendErr(res, 404, chosenOptions.notFoundMsg)
     sendRes(chosenOptions.statusCode, res, { data: doc }, chosenOptions.sendRes)
     if (chosenOptions.callNext) next()
@@ -133,11 +139,12 @@ const getOneById = (Model, id, options) =>
 
 const updateOne = (Model, filterObj, updateObj, options) =>
   expressAsyncHandler(async (req, res, next) => {
-    // @param Model: MongooseModel
+    // @param Model: MongooseModel | function
     // @param filterObj: object | function
     // @param updateObj: object | function
     // @param options: object | function
     // getting the parameters values ---------------
+    const ModelValue = await getValue(Model, req)
     const filterObjValue = await getValue(filterObj, req)
     const updateObjValue = await getValue(updateObj, req)
     const optionsValue = await getValue(options, req)
@@ -153,7 +160,7 @@ const updateOne = (Model, filterObj, updateObj, options) =>
     }
     _.merge(chosenOptions, defaultOptions, optionsValue)
 
-    const doc = await Model.findOneAndUpdate(filterObjValue, updateObjValue, chosenOptions.queryOptions)
+    const doc = await ModelValue.findOneAndUpdate(filterObjValue, updateObjValue, chosenOptions.queryOptions)
     if (chosenOptions.notFoundErr && !doc) return sendErr(res, 404, chosenOptions.notFoundMsg)
     sendRes(chosenOptions.statusCode, res, { data: doc }, chosenOptions.sendRes)
     if (chosenOptions.callNext) next()
@@ -161,11 +168,12 @@ const updateOne = (Model, filterObj, updateObj, options) =>
 
 const updateOneById = (Model, id, updateObj, options) =>
   expressAsyncHandler(async (req, res, next) => {
-    // @param Model: MongooseModel
+    // @param Model: MongooseModel | function
     // @param id: ObjectId | string | function
     // @param updateObj: object | function
     // @param options: object | function
     // getting the parameters values ---------------
+    const ModelValue = await getValue(Model, req)
     const idValue = await getValue(id, req)
     const updateObjValue = await getValue(updateObj, req)
     const optionsValue = await getValue(options, req)
@@ -181,7 +189,7 @@ const updateOneById = (Model, id, updateObj, options) =>
     }
     _.merge(chosenOptions, defaultOptions, optionsValue)
 
-    const doc = await Model.findByIdAndUpdate(idValue, updateObjValue, chosenOptions.queryOptions)
+    const doc = await ModelValue.findByIdAndUpdate(idValue, updateObjValue, chosenOptions.queryOptions)
     if (chosenOptions.notFoundErr && !doc) return sendErr(res, 404, chosenOptions.notFoundMsg)
     sendRes(chosenOptions.statusCode, res, { data: doc }, chosenOptions.sendRes)
     if (chosenOptions.callNext) next()
@@ -189,11 +197,12 @@ const updateOneById = (Model, id, updateObj, options) =>
 
 const updateOneWithSave = (Model, filterObj, updateObj, options) =>
   expressAsyncHandler(async (req, res, next) => {
-    // @param Model: MongooseModel
+    // @param Model: MongooseModel | function
     // @param filterObj: object | function
     // @param updateObj: object | function
     // @param options: object | function
     // getting the parameters values ---------------
+    const ModelValue = await getValue(Model, req)
     const filterObjValue = await getValue(filterObj, req)
     const updateObjValue = await getValue(updateObj, req)
     const optionsValue = await getValue(options, req)
@@ -210,7 +219,7 @@ const updateOneWithSave = (Model, filterObj, updateObj, options) =>
     }
     _.merge(chosenOptions, defaultOptions, optionsValue)
 
-    const doc = await Model.findOne(filterObjValue, chosenOptions.projection, chosenOptions.queryOptions)
+    const doc = await ModelValue.findOne(filterObjValue, chosenOptions.projection, chosenOptions.queryOptions)
     if (chosenOptions.notFoundErr && !doc) return sendErr(res, 404, chosenOptions.notFoundMsg)
     const newDoc = await saveUpdate(doc, updateObjValue, chosenOptions.saveQueryOptions)
     sendRes(chosenOptions.statusCode, res, { data: newDoc }, chosenOptions.sendRes)
@@ -219,11 +228,12 @@ const updateOneWithSave = (Model, filterObj, updateObj, options) =>
 
 const updateOneByIdWithSave = (Model, id, updateObj, options) =>
   expressAsyncHandler(async (req, res, next) => {
-    // @param Model: MongooseModel
+    // @param Model: MongooseModel | function
     // @param id: object | function
     // @param updateObj: object | function
     // @param options: object | function
     // getting the parameters values ---------------
+    const ModelValue = await getValue(Model, req)
     const idValue = await getValue(id, req)
     const updateObjValue = await getValue(updateObj, req)
     const optionsValue = await getValue(options, req)
@@ -240,7 +250,7 @@ const updateOneByIdWithSave = (Model, id, updateObj, options) =>
     }
     _.merge(chosenOptions, defaultOptions, optionsValue)
 
-    const doc = await Model.findById(idValue, chosenOptions.projection, chosenOptions.queryOptions)
+    const doc = await ModelValue.findById(idValue, chosenOptions.projection, chosenOptions.queryOptions)
     if (chosenOptions.notFoundErr && !doc) return sendErr(res, 404, chosenOptions.notFoundMsg)
     const newDoc = await saveUpdate(doc, updateObjValue, chosenOptions.saveQueryOptions)
     sendRes(chosenOptions.statusCode, res, { data: newDoc }, chosenOptions.sendRes)
@@ -253,10 +263,11 @@ const updateOneByIdWithSave = (Model, id, updateObj, options) =>
 
 const deleteOne = (Model, filterObj, options) =>
   expressAsyncHandler(async (req, res, next) => {
-    // @param Model: MongooseModel
+    // @param Model: MongooseModel | function
     // @param filterObj: object | function
     // @param options: object | function
     // getting the parameters values ---------------
+    const ModelValue = await getValue(Model, req)
     const filterObjValue = await getValue(filterObj, req)
     const optionsValue = await getValue(options, req)
     // working with the options ---------------
@@ -272,17 +283,18 @@ const deleteOne = (Model, filterObj, options) =>
     }
     _.merge(chosenOptions, defaultOptions, optionsValue)
 
-    const doc = await Model.findOneAndDelete(filterObjValue, chosenOptions.queryOptions)
+    const doc = await ModelValue.findOneAndDelete(filterObjValue, chosenOptions.queryOptions)
     if (chosenOptions.notFoundErr && !doc) return sendErr(res, 404, chosenOptions.notFoundMsg)
     sendRes(chosenOptions.statusCode, res, { data: chosenOptions.sendDeletedDoc ? doc : null }, chosenOptions.sendRes)
     if (chosenOptions.callNext) next()
   })
 const deleteOneById = (Model, id, options) =>
   expressAsyncHandler(async (req, res, next) => {
-    // @param Model: MongooseModel
+    // @param Model: MongooseModel | function
     // @param id: ObjectId | string | function
     // @param options: object | function
     // getting the parameters values ---------------
+    const ModelValue = await getValue(Model, req)
     const idValue = await getValue(id, req)
     const optionsValue = await getValue(options, req)
     // working with the options ---------------
@@ -298,17 +310,18 @@ const deleteOneById = (Model, id, options) =>
     }
     _.merge(chosenOptions, defaultOptions, optionsValue)
 
-    const doc = await Model.findByIdAndDelete(idValue, chosenOptions.queryOptions)
+    const doc = await ModelValue.findByIdAndDelete(idValue, chosenOptions.queryOptions)
     if (chosenOptions.notFoundErr && !doc) return sendErr(res, 404, chosenOptions.notFoundMsg)
     sendRes(chosenOptions.statusCode, res, { data: chosenOptions.sendDeletedDoc ? doc : null }, chosenOptions.sendRes)
     if (chosenOptions.callNext) next()
   })
 const archiveOne = (Model, filterObj, options) =>
   expressAsyncHandler(async (req, res, next) => {
-    // @param Model: MongooseModel
+    // @param Model: MongooseModel | function
     // @param filterObj: object | function
     // @param options: object | function
     // getting the parameters values ---------------
+    const ModelValue = await getValue(Model, req)
     const filterObjValue = await getValue(filterObj, req)
     const optionsValue = await getValue(options, req)
     // working with the options ---------------
@@ -324,7 +337,7 @@ const archiveOne = (Model, filterObj, options) =>
     }
     _.merge(chosenOptions, defaultOptions, optionsValue)
 
-    const doc = await archiveDoc(Model, filterObjValue, {
+    const doc = await archiveDoc(ModelValue, filterObjValue, {
       ...chosenOptions.queryOptions,
       notFoundErr: false,
     })
@@ -335,10 +348,11 @@ const archiveOne = (Model, filterObj, options) =>
   })
 const archiveOneById = (Model, id, options) =>
   expressAsyncHandler(async (req, res, next) => {
-    // @param Model: MongooseModel
+    // @param Model: MongooseModel | function
     // @param id: ObjectId | string | function
     // @param options: object | function
     // getting the parameters values ---------------
+    const ModelValue = await getValue(Model, req)
     const idValue = await getValue(id, req)
     const optionsValue = await getValue(options, req)
     // working with the options ---------------
@@ -355,7 +369,7 @@ const archiveOneById = (Model, id, options) =>
     _.merge(chosenOptions, defaultOptions, optionsValue)
 
     const doc = await archiveDoc(
-      Model,
+      ModelValue,
       { _id: idValue },
       {
         queryOptions: chosenOptions.queryOptions,

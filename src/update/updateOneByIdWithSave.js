@@ -8,7 +8,7 @@ const { setDoc } = require('setdoc')
 const getValue = require('../../utils/getValue')
 const saveUpdate = require('../../utils/saveUpdate')
 const { sharedDefaultOptions, oneStuffDefaultOptions } = require('../../utils/defaultOptions')
-
+const NotFoundError = require('../../utils/NotFoundError')
 /*=====  End of importing dependencies  ======*/
 
 const updateOneByIdWithSave = (Model, id, updateObj, options) =>
@@ -45,8 +45,8 @@ const updateOneByIdWithSave = (Model, id, updateObj, options) =>
       }
     )
     if (!doc && chosenOptions.notFoundErr) {
-      if (chosenOptions.handleNotFoundErr) sendRes(chosenOptions.statusCode, res, { message: chosenOptions.notFoundMsg })
-      else return next(new NotFoundError(chosenOptions.notFoundMsg, chosenOptions.statusCode))
+      if (chosenOptions.handleNotFoundErr) return sendRes(chosenOptions.notFoundStatusCode, res, { message: chosenOptions.notFoundMsg })
+      else return next(new NotFoundError(chosenOptions.notFoundMsg, chosenOptions.notFoundStatusCode))
     }
     doc = await setDoc(async () => saveUpdate(doc, updateObjValue, chosenOptions.saveQueryOptions))
     // running the post-query hook ---------------

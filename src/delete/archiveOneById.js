@@ -8,6 +8,7 @@ const { setDoc } = require('setdoc')
 const getValue = require('../../utils/getValue')
 const archiveDoc = require('../../utils/archiveDoc')
 const { sharedDefaultOptions, oneStuffDefaultOptions } = require('../../utils/defaultOptions')
+const NotFoundError = require('../../utils/NotFoundError')
 /*=====  End of importing dependencies  ======*/
 
 const archiveOneById = (Model, id, options) =>
@@ -50,8 +51,8 @@ const archiveOneById = (Model, id, options) =>
       }
     )
     if (!doc && chosenOptions.notFoundErr) {
-      if (chosenOptions.handleNotFoundErr) sendRes(chosenOptions.statusCode, res, { message: chosenOptions.notFoundMsg })
-      else return next(new NotFoundError(chosenOptions.notFoundMsg, chosenOptions.statusCode))
+      if (chosenOptions.handleNotFoundErr) return sendRes(chosenOptions.notFoundStatusCode, res, { message: chosenOptions.notFoundMsg })
+      else return next(new NotFoundError(chosenOptions.notFoundMsg, chosenOptions.notFoundStatusCode))
     }
     // running the post-query hook ---------------
     doc = await chosenOptions.post(doc)

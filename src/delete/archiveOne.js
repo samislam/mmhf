@@ -47,8 +47,8 @@ const archiveOne = (Model, filterObj, options) =>
       }
     )
     if (!doc && chosenOptions.notFoundErr) {
-      if (chosenOptions.handleNotFoundErr) sendRes(chosenOptions.statusCode, res, { message: chosenOptions.notFoundMsg })
-      else return next(new NotFoundError(chosenOptions.notFoundMsg, chosenOptions.statusCode))
+      if (chosenOptions.handleNotFoundErr) return sendRes(chosenOptions.notFoundStatusCode, res, { message: chosenOptions.notFoundMsg })
+      else return next(new NotFoundError(chosenOptions.notFoundMsg, chosenOptions.notFoundStatusCode))
     }
     // running the post-query hook ---------------
     doc = await chosenOptions.post(doc)

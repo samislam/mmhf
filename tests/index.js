@@ -23,7 +23,13 @@ router
 
 router
   .route('/users/:id')
-  .get(factory.getOne(UserModel, (req) => ({ _id: req.params.id })))
+  .get(
+    factory.getOne(UserModel, (req) => ({ _id: req.params.id }), {
+      notFoundMsg: 'Boys',
+      notFoundStatusCode: 404,
+      handleNotFoundErr: false,
+    })
+  )
   .patch(
     factory.updateOneByIdWithSave(
       UserModel,
@@ -39,7 +45,10 @@ app.use((error, req, res, next) => {
   if (error.isOperational) {
     console.log('operational error!')
     sendRes(error.statusCode, res, { ...error })
-  } else sendRes(error.statusCode || 400, res, error)
+  } else {
+    console.log(error)
+    sendRes(error.statusCode || 400, res, error)
+  }
 })
 
 /*=============================================

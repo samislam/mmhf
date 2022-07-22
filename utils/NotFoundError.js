@@ -3,7 +3,6 @@ class NotFoundError extends Error {
     super(message)
     this.name = 'factoryNotFoundError'
     this.statusCode = statusCode
-    this.name = errName
 
     Error.captureStackTrace(this, this.constructor)
   }

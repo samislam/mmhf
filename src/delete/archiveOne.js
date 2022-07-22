@@ -5,8 +5,8 @@ const expressAsyncHandler = require('express-async-handler')
 const _ = require('lodash')
 const { sendRes } = require('@samislam/sendres')
 const { setDoc } = require('setdoc')
-const to = require('await-to-js').default
 const getValue = require('../../utils/getValue')
+const archiveDoc = require('../../utils/archiveDoc')
 const { sharedDefaultOptions, oneStuffDefaultOptions } = require('../../utils/defaultOptions')
 /*=====  End of importing dependencies  ======*/
 
@@ -31,28 +31,22 @@ const archiveOne = (Model, filterObj, options) =>
     _.merge(chosenOptions, defaultOptions, optionsValue)
 
     // querying the database ---------------
-    let [err, doc] = await to(
-      setDoc(
-        async () => {
-          // running the pre-query hook ---------------
-          const query = archiveDoc(ModelValue, filterObjValue, {
-            ...chosenOptions.queryOptions,
-            notFoundErr: false,
-          })
-          return await chosenOptions.pre(query)
-        },
-        {
-          notFoundErr: chosenOptions.notFoundErr,
-          notFoundMsg: chosenOptions.notFoundMsg,
-          notFoundStatusCode: chosenOptions.notFoundStatusCode,
-        }
-      )
+    let doc = setDoc(
+      async () => {
+        // running the pre-query hook ---------------
+        const query = archiveDoc(ModelValue, filterObjValue, {
+          queryOptions: chosenOptions.queryOptions,
+          uniqueId: chosenOptions.uniqueId,
+          uniqueFields: chosenOptions.uniqueFields,
+        })
+        return await chosenOptions.pre(query)
+      },
+      {
+        notFoundErr: chosenOptions.notFoundErr,
+        notFoundMsg: chosenOptions.notFoundMsg,
+        notFoundStatusCode: chosenOptions.notFoundStatusCode,
+      }
     )
-    // handling the not found logic ---------------
-    if (err) {
-      if (chosenOptions.notFoundErr && err.name === 'setDoc_notFound_error') return sendRes(err.statusCode, res, { message: err.message })
-      else throw err
-    }
     // running the post-query hook ---------------
     doc = await chosenOptions.post(doc)
     // sending the response ---------------
@@ -62,5 +56,3 @@ const archiveOne = (Model, filterObj, options) =>
 
 /*----------  end of code, exporting  ----------*/
 module.exports = archiveOne
-
-// TODO

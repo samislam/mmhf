@@ -6,6 +6,7 @@ const _ = require('lodash')
 const { sendRes } = require('@samislam/sendres')
 const { setDoc } = require('setdoc')
 const getValue = require('../../utils/getValue')
+const saveUpdate = require('../../utils/saveUpdate')
 const { sharedDefaultOptions, oneStuffDefaultOptions } = require('../../utils/defaultOptions')
 
 /*=====  End of importing dependencies  ======*/
@@ -32,14 +33,26 @@ const updateOneByIdWithSave = (Model, id, updateObj, options) =>
     }
     _.merge(chosenOptions, defaultOptions, optionsValue)
 
-    const doc = await ModelValue.findById(idValue, chosenOptions.projection, chosenOptions.queryOptions)
-    if (chosenOptions.notFoundErr && !doc) return sendErr(res, 404, chosenOptions.notFoundMsg)
-    const newDoc = await saveUpdate(doc, updateObjValue, chosenOptions.saveQueryOptions)
+    // querying the database ---------------
+    let doc = await setDoc(
+      async () => {
+        // running the pre-query hook ---------------
+        const query = ModelValue.findById(idValue, chosenOptions.projection, chosenOptions.queryOptions)
+        return await chosenOptions.pre(query)
+      },
+      {
+        notFoundErr: chosenOptions.notFoundErr,
+        notFoundMsg: chosenOptions.notFoundMsg,
+        notFoundStatusCode: chosenOptions.notFoundStatusCode,
+      }
+    )
+    doc = await setDoc(async () => saveUpdate(doc, updateObjValue, chosenOptions.saveQueryOptions))
+    // running the post-query hook ---------------
+    doc = await chosenOptions.post(doc)
+    // sending the response ---------------
     sendRes(chosenOptions.statusCode, res, { data: newDoc }, chosenOptions.sendRes)
     if (chosenOptions.callNext) next()
   })
 
 /*----------  end of code exporting  ----------*/
 module.exports = updateOneByIdWithSave
-
-// TODO

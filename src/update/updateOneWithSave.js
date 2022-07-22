@@ -5,8 +5,8 @@ const expressAsyncHandler = require('express-async-handler')
 const _ = require('lodash')
 const { sendRes } = require('@samislam/sendres')
 const { setDoc } = require('setdoc')
-const to = require('await-to-js').default
 const getValue = require('../../utils/getValue')
+const saveUpdate = require('../../utils/saveUpdate')
 const { sharedDefaultOptions, oneStuffDefaultOptions } = require('../../utils/defaultOptions')
 
 /*=====  End of importing dependencies  ======*/
@@ -25,23 +25,34 @@ const updateOneWithSave = (Model, filterObj, updateObj, options) =>
     // working with the options ---------------
     const chosenOptions = {}
     const defaultOptions = {
-      sendRes: {},
+      ...sharedDefaultOptions,
+      ...oneStuffDefaultOptions,
       queryOptions: {},
       saveQueryOptions: {},
-      callNext: false,
       statusCode: 200,
-      notFoundMsg: notFoundDefaultMsg,
-      notFoundErr: true,
     }
     _.merge(chosenOptions, defaultOptions, optionsValue)
 
-    const doc = await ModelValue.findOne(filterObjValue, chosenOptions.projection, chosenOptions.queryOptions)
-    if (chosenOptions.notFoundErr && !doc) return sendErr(res, 404, chosenOptions.notFoundMsg)
-    const newDoc = await saveUpdate(doc, updateObjValue, chosenOptions.saveQueryOptions)
+    // querying the database ---------------
+    let doc = await setDoc(
+      async () => {
+        // running the pre-query hook ---------------
+        const query = ModelValue.findOne(filterObjValue, chosenOptions.projection, chosenOptions.queryOptions)
+        return await chosenOptions.pre(query)
+      },
+      {
+        notFoundErr: chosenOptions.notFoundErr,
+        notFoundMsg: chosenOptions.notFoundMsg,
+        notFoundStatusCode: chosenOptions.notFoundStatusCode,
+      }
+    )
+    doc = await setDoc(async () => saveUpdate(doc, updateObjValue, chosenOptions.saveQueryOptions))
+    // running the post-query hook ---------------
+    doc = await chosenOptions.post(doc)
+    // sending the response ---------------
     sendRes(chosenOptions.statusCode, res, { data: newDoc }, chosenOptions.sendRes)
     if (chosenOptions.callNext) next()
   })
 
 /*----------  end of code, exporting  ----------*/
 module.exports = updateOneWithSave
-// TODO

@@ -6,11 +6,7 @@ const uniqid = require('uniqid')
 
 /*=====  End of importing dependencies  ======*/
 
-function sendErr(res, statusCode, message) {
-  sendRes(statusCode, res, { message })
-}
-
-async function archiveDoc(Model, filterObj, options) {
+function archiveDoc(Model, filterObj, options) {
   // @param Model: MongooseModel | function
   // @param filterObj: object | function
   // @param: options: object | function
@@ -18,8 +14,6 @@ async function archiveDoc(Model, filterObj, options) {
   const chosenOptions = {} // to prevent mutating the options argument
   const defaultOptions = {
     queryOptions: {},
-    notFoundMsg: 'No record found with that ID',
-    notFoundErr: true,
     uniqueId: uniqid(),
     uniqueFields: null,
   }
@@ -35,9 +29,8 @@ async function archiveDoc(Model, filterObj, options) {
     })
   const updateQuery = [{ $set: setObj }]
 
-  const doc = await Model.findOneAndUpdate(filterObj, updateQuery, chosenOptions.queryOptions)
-  if (chosenOptions.notFoundErr && !doc) throw new sendErr(chosenOptions.notFoundMsg, 404)
-  return doc
+  const query = Model.findOneAndUpdate(filterObj, updateQuery, chosenOptions.queryOptions)
+  return query
 }
 
 /*----------  end of code, exporting  ----------*/

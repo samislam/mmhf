@@ -5,8 +5,8 @@ const expressAsyncHandler = require('express-async-handler')
 const _ = require('lodash')
 const { sendRes } = require('@samislam/sendres')
 const { setDoc } = require('setdoc')
-const to = require('await-to-js').default
 const getValue = require('../../utils/getValue')
+const archiveDoc = require('../../utils/archiveDoc')
 const { sharedDefaultOptions, oneStuffDefaultOptions } = require('../../utils/defaultOptions')
 /*=====  End of importing dependencies  ======*/
 
@@ -30,17 +30,29 @@ const archiveOneById = (Model, id, options) =>
     }
     _.merge(chosenOptions, defaultOptions, optionsValue)
 
-    const doc = await archiveDoc(
-      ModelValue,
-      { _id: idValue },
+    // querying the database ---------------
+    let doc = await setDoc(
+      async () => {
+        // running the pre-query hook ---------------
+        const query = archiveDoc(
+          ModelValue,
+          { _id: idValue },
+          {
+            queryOptions: chosenOptions.queryOptions,
+            uniqueId: chosenOptions.uniqueId,
+            uniqueFields: chosenOptions.uniqueFields,
+          }
+        )
+        return await chosenOptions.pre(query)
+      },
       {
-        queryOptions: chosenOptions.queryOptions,
-        uniqueId: chosenOptions.uniqueId,
-        uniqueFields: chosenOptions.uniqueFields,
-        notFoundErr: false,
+        notFoundErr: chosenOptions.notFoundErr,
+        notFoundMsg: chosenOptions.notFoundMsg,
+        notFoundStatusCode: chosenOptions.notFoundStatusCode,
       }
     )
-    if (chosenOptions.notFoundErr && !doc) return sendErr(res, 404, chosenOptions.notFoundMsg)
+    // running the post-query hook ---------------
+    doc = await chosenOptions.post(doc)
     // sending the response ---------------
     sendRes(chosenOptions.statusCode, res, { data: chosenOptions.sendArchivedDoc ? doc : null }, chosenOptions.sendRes)
     if (chosenOptions.callNext) next()
@@ -48,5 +60,3 @@ const archiveOneById = (Model, id, options) =>
 
 /*----------  end of code, exporting  ----------*/
 module.exports = archiveOneById
-
-// TODO

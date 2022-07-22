@@ -2,21 +2,21 @@
 =            importing dependencies            =
 =============================================*/
 const traverse = require('traverse')
-const checkTypes = require('@samislam/checktypes')
-const log = require('@samislam/log')
-/*=====  End of importing dependencies  ======*/
 const _ = require('lodash')
+/*=====  End of importing dependencies  ======*/
 
-async function saveUpdate(oldDoc, updateObj, saveQueryOptions) {
-  // mutates the original document and returns the updated document response from the DB.
+function saveUpdate(oldDoc, updateObj, saveQueryOptions) {
+  // mutates the original document and returns a query which holds the update logic.
 
   traverse(updateObj).forEach(function (v) {
     _.set(oldDoc, this.path, v)
   })
 
-  const newDoc = await oldDoc.save(saveQueryOptions)
-  return newDoc
+  const query = oldDoc.save(saveQueryOptions)
+  return query
 }
 
 /*----------  end of code, exporting  ----------*/
 module.exports = saveUpdate
+
+// TODO: make this a separate NPM package

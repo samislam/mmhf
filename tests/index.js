@@ -6,7 +6,7 @@ const express = require('express')
 const log = require('@samislam/log')
 const { sendRes } = require('@samislam/sendres')
 
-const factory = require('../index')
+const factory = require('../src/index')
 // Models -----
 const { UserModel } = require('./mongoose_models')
 /*=====  End of importing dependencies  ======*/
@@ -22,7 +22,7 @@ app
 
 app
   .route('/api/users/:id')
-  .get(factory.getOne(UserModel, (req) => ({ _id: req.params.id }), { handleNotFoundError: false }))
+  .get(factory.getOne(UserModel, (req) => ({ _id: req.params.id })))
   .patch(
     factory.updateOneByIdWithSave(
       UserModel,

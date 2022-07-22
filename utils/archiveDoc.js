@@ -49,4 +49,4 @@ module.exports = archiveDoc
  * ~ handles the unique fields issue as well.
  */
 
-// todo: convert this module to a soft-delete plugin for mongoose schemas
+// TODO: convert this module to a soft-delete plugin for mongoose schemas

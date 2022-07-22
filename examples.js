@@ -8,6 +8,8 @@ factory.getOneById(Model, id, options)
 // [U] Update ----
 factory.updateOne(Model, filterObj, updateObj, options)
 factory.updateOneById(Model, id, updateObj, options)
+factory.updateOneWithSave(Model, filterObj, updateObj, options)
+factory.updateOneWithSaveById(Model, id, updateObj, options)
 // [D] Delete ----
 factory.deleteOne(Model, filterObj, options)
 factory.deleteOneById(Model, id, options)

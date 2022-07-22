@@ -5,7 +5,6 @@ const expressAsyncHandler = require('express-async-handler')
 const _ = require('lodash')
 const { sendRes } = require('@samislam/sendres')
 const { setDoc } = require('setdoc')
-const to = require('await-to-js').default
 const getValue = require('../../utils/getValue')
 const { sharedDefaultOptions, oneStuffDefaultOptions } = require('../../utils/defaultOptions')
 /*=====  End of importing dependencies  ======*/
@@ -31,25 +30,18 @@ const deleteOneById = (Model, id, options) =>
     _.merge(chosenOptions, defaultOptions, optionsValue)
 
     // querying the database ---------------
-    let [err, doc] = await to(
-      setDoc(
-        async () => {
-          // running the pre-query hook ---------------
-          const query = ModelValue.findByIdAndDelete(idValue, chosenOptions.queryOptions)
-          return await chosenOptions.pre(query)
-        },
-        {
-          notFoundErr: chosenOptions.notFoundErr,
-          notFoundMsg: chosenOptions.notFoundMsg,
-          notFoundStatusCode: chosenOptions.notFoundStatusCode,
-        }
-      )
+    let doc = await setDoc(
+      async () => {
+        // running the pre-query hook ---------------
+        const query = ModelValue.findByIdAndDelete(idValue, chosenOptions.queryOptions)
+        return await chosenOptions.pre(query)
+      },
+      {
+        notFoundErr: chosenOptions.notFoundErr,
+        notFoundMsg: chosenOptions.notFoundMsg,
+        notFoundStatusCode: chosenOptions.notFoundStatusCode,
+      }
     )
-    // handling the not found logic ---------------
-    if (err) {
-      if (chosenOptions.notFoundErr && err.name === 'setDoc_notFound_error') return sendRes(err.statusCode, res, { message: err.message })
-      else throw err
-    }
     // running the post-query hook ---------------
     doc = await chosenOptions.post(doc)
     // sending the response ---------------

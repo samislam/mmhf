@@ -30,12 +30,32 @@ const archiveOne = (Model, filterObj, options) =>
     }
     _.merge(chosenOptions, defaultOptions, optionsValue)
 
-    const doc = await archiveDoc(ModelValue, filterObjValue, {
-      ...chosenOptions.queryOptions,
-      notFoundErr: false,
-    })
-    if (chosenOptions.notFoundErr && !doc) return sendErr(res, 404, chosenOptions.notFoundMsg)
-
+    // querying the database ---------------
+    let [err, doc] = await to(
+      setDoc(
+        async () => {
+          // running the pre-query hook ---------------
+          const query = archiveDoc(ModelValue, filterObjValue, {
+            ...chosenOptions.queryOptions,
+            notFoundErr: false,
+          })
+          return await chosenOptions.pre(query)
+        },
+        {
+          notFoundErr: chosenOptions.notFoundErr,
+          notFoundMsg: chosenOptions.notFoundMsg,
+          notFoundStatusCode: chosenOptions.notFoundStatusCode,
+        }
+      )
+    )
+    // handling the not found logic ---------------
+    if (err) {
+      if (chosenOptions.notFoundErr && err.name === 'setDoc_notFound_error') return sendRes(err.statusCode, res, { message: err.message })
+      else throw err
+    }
+    // running the post-query hook ---------------
+    doc = await chosenOptions.post(doc)
+    // sending the response ---------------
     sendRes(chosenOptions.statusCode, res, { data: chosenOptions.sendArchivedDoc ? doc : null }, chosenOptions.sendRes)
     if (chosenOptions.callNext) next()
   })

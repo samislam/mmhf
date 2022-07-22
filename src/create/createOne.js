@@ -32,7 +32,7 @@ const createOne = (Model, dataObj, options) =>
       return await chosenOptions.pre(query)
     })
     doc = await chosenOptions.post(doc)
-
+    // sending the response ---------------
     sendRes(chosenOptions.statusCode, res, { data: doc }, chosenOptions.sendRes)
     if (chosenOptions.callNext) next()
   })

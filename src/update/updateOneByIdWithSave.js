@@ -5,7 +5,6 @@ const expressAsyncHandler = require('express-async-handler')
 const _ = require('lodash')
 const { sendRes } = require('@samislam/sendres')
 const { setDoc } = require('setdoc')
-const to = require('await-to-js').default
 const getValue = require('../../utils/getValue')
 const { sharedDefaultOptions, oneStuffDefaultOptions } = require('../../utils/defaultOptions')
 

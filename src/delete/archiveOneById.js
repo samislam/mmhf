@@ -41,7 +41,7 @@ const archiveOneById = (Model, id, options) =>
       }
     )
     if (chosenOptions.notFoundErr && !doc) return sendErr(res, 404, chosenOptions.notFoundMsg)
-
+    // sending the response ---------------
     sendRes(chosenOptions.statusCode, res, { data: chosenOptions.sendArchivedDoc ? doc : null }, chosenOptions.sendRes)
     if (chosenOptions.callNext) next()
   })

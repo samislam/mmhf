@@ -22,6 +22,7 @@ const userSchema = new mongoose.Schema({
     nestedName: String,
     loginAttempts: Array,
   },
+  subscribers: [{ email: String, name: String }],
 })
 
 const UserModel = mongoose.model('User', userSchema, 'users')

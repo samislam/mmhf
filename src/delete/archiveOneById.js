@@ -28,6 +28,8 @@ const archiveOneById = (Model, id, options) =>
       queryOptions: {},
       statusCode: 204,
       sendArchivedDoc: false,
+      uniqueId: undefined,
+      uniqueFields: undefined,
     }
     _.merge(chosenOptions, defaultOptions, optionsValue)
 

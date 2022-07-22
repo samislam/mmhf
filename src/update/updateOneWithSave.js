@@ -53,7 +53,7 @@ const updateOneWithSave = (Model, filterObj, updateObj, options) =>
     // running the post-query hook ---------------
     doc = await chosenOptions.post(doc)
     // sending the response ---------------
-    sendRes(chosenOptions.statusCode, res, { data: newDoc }, chosenOptions.sendRes)
+    sendRes(chosenOptions.statusCode, res, { data: doc }, chosenOptions.sendRes)
     if (chosenOptions.callNext) next()
   })
 

@@ -18,16 +18,29 @@ app.use('/api', router)
 
 router
   .route('/users')
-  .get(factory.getMany(UserModel))
+  .get(
+    factory.getMany(
+      UserModel,
+      {},
+      {
+        pre(query) {
+          return query.sort('name')
+        },
+      }
+    )
+  )
   .post(factory.createOne(UserModel, (req) => req.body))
 
 router
   .route('/users/:id')
   .get(
     factory.getOne(UserModel, (req) => ({ _id: req.params.id }), {
-      notFoundMsg: 'Boys',
+      notFoundMsg: 'Boys, nothing was fonud!',
       notFoundStatusCode: 404,
-      handleNotFoundErr: false,
+      // handleNotFoundErr: false,
+      post(doc) {
+        return doc.name
+      },
     })
   )
   .patch(
@@ -37,7 +50,7 @@ router
       (req) => req.body
     )
   )
-  .delete(factory.deleteOneById(UserModel, (req) => req.params.id))
+  .delete(factory.archiveOneById(UserModel, (req) => req.params.id))
 
 // global error handling middleware ---------------:
 app.use((error, req, res, next) => {

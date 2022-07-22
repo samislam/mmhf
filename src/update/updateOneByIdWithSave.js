@@ -41,11 +41,13 @@ const updateOneByIdWithSave = (Model, id, updateObj, options) =>
         return await chosenOptions.pre(query)
       },
       {
-        notFoundErr: chosenOptions.notFoundErr,
-        notFoundMsg: chosenOptions.notFoundMsg,
-        notFoundStatusCode: chosenOptions.notFoundStatusCode,
+        notFoundErr: false,
       }
     )
+    if (!doc && chosenOptions.notFoundErr) {
+      if (chosenOptions.handleNotFoundErr) sendRes(chosenOptions.statusCode, res, { message: chosenOptions.notFoundMsg })
+      else return next(new NotFoundError(chosenOptions.notFoundMsg, chosenOptions.statusCode))
+    }
     doc = await setDoc(async () => saveUpdate(doc, updateObjValue, chosenOptions.saveQueryOptions))
     // running the post-query hook ---------------
     doc = await chosenOptions.post(doc)

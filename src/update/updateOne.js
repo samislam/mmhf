@@ -39,11 +39,13 @@ const updateOne = (Model, filterObj, updateObj, options) =>
         return await chosenOptions.pre(query)
       },
       {
-        notFoundErr: chosenOptions.notFoundErr,
-        notFoundMsg: chosenOptions.notFoundMsg,
-        notFoundStatusCode: chosenOptions.notFoundStatusCode,
+        notFoundErr: false,
       }
     )
+    if (!doc && chosenOptions.notFoundErr) {
+      if (chosenOptions.handleNotFoundErr) sendRes(chosenOptions.statusCode, res, { message: chosenOptions.notFoundMsg })
+      else return next(new NotFoundError(chosenOptions.notFoundMsg, chosenOptions.statusCode))
+    }
     // running the post-query hook ---------------
     doc = await chosenOptions.post(doc)
     // sending the response ---------------

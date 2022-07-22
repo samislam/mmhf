@@ -6,6 +6,9 @@ const _ = require('lodash')
 const { sendRes } = require('@samislam/sendres')
 const checkTypes = require('@samislam/checktypes')
 const expressAsyncHandler = require('express-async-handler')
+const { setDoc, globalOptions: setDocGlobalOptions } = require('setdoc')
+const to = require('await-to-js').default
+
 const archiveDoc = require('./utils/archiveDoc')
 const saveUpdate = require('./utils/saveUpdate')
 /*=====  End of importing dependencies  ======*/
@@ -41,10 +44,17 @@ const createOne = (Model, dataObj, options) =>
       queryOptions: {},
       callNext: false,
       statusCode: 201,
+      pre: (query) => query,
+      post: (doc) => doc,
     }
     _.merge(chosenOptions, defaultOptions, optionsValue)
 
-    const doc = await ModelValue.create(dataObjValue)
+    let doc = await setDoc(async () => {
+      const query = ModelValue.create(dataObjValue)
+      return await chosenOptions.pre(query)
+    })
+    doc = await chosenOptions.post(doc)
+
     sendRes(chosenOptions.statusCode, res, { data: doc }, chosenOptions.sendRes)
     if (chosenOptions.callNext) next()
   })
@@ -70,10 +80,17 @@ const getMany = (Model, filterObj = {}, options) =>
       callNext: false,
       projection: null,
       statusCode: 200,
+      pre: (query) => query,
+      post: (doc) => doc,
     }
     _.merge(chosenOptions, defaultOptions, optionsValue)
 
-    const docs = await ModelValue.find(filterObjValue, chosenOptions.projection, chosenOptions.queryOptions)
+    let docs = await setDoc(async () => {
+      const query = ModelValue.find(filterObjValue, chosenOptions.projection, chosenOptions.queryOptions)
+      return await chosenOptions.pre(query)
+    })
+    docs = await chosenOptions.post(docs)
+
     sendRes(chosenOptions.statusCode, res, { $$data: docs }, chosenOptions.sendRes)
     if (chosenOptions.callNext) next()
   })
@@ -95,13 +112,35 @@ const getOne = (Model, filterObj, options) =>
       callNext: false,
       projection: null,
       statusCode: 200,
-      notFoundMsg: notFoundDefaultMsg,
-      notFoundErr: true,
+      notFoundMsg: setDocGlobalOptions.notFoundMsg,
+      notFoundErr: setDocGlobalOptions.notFoundErr,
+      notFoundStatusCode: setDocGlobalOptions.notFoundStatusCode,
+      handleNotFoundError: true,
+      pre: (query) => query,
+      post: (doc) => doc,
     }
     _.merge(chosenOptions, defaultOptions, optionsValue)
 
-    const doc = await ModelValue.findOne(filterObjValue, chosenOptions.projection, chosenOptions.queryOptions)
-    if (chosenOptions.notFoundErr && !doc) return sendErr(res, 404, chosenOptions.notFoundMsg)
+    let [err, doc] = await to(
+      setDoc(
+        async () => {
+          const query = ModelValue.findOne(filterObjValue, chosenOptions.projection, chosenOptions.queryOptions)
+          return await chosenOptions.pre(query)
+        },
+        {
+          notFoundErr: chosenOptions.notFoundErr,
+          notFoundMsg: chosenOptions.notFoundMsg,
+          notFoundStatusCode: chosenOptions.notFoundStatusCode,
+        }
+      )
+    )
+    if (err) {
+      if (chosenOptions.handleNotFoundError && err.name === 'setDoc_notFound_error')
+        return sendErr(res, chosenOptions.notFoundStatusCode, chosenOptions.notFoundMsg)
+      else throw err
+    }
+    doc = await chosenOptions.post(doc)
+
     sendRes(chosenOptions.statusCode, res, { data: doc }, chosenOptions.sendRes)
     if (chosenOptions.callNext) next()
   })

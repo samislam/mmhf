@@ -22,7 +22,7 @@ app
 
 app
   .route('/api/users/:id')
-  .get(factory.getOneById(UserModel, (req) => req.params.id))
+  .get(factory.getOne(UserModel, (req) => ({ _id: req.params.id }), { handleNotFoundError: false }))
   .patch(
     factory.updateOneByIdWithSave(
       UserModel,
@@ -34,10 +34,11 @@ app
 
 // global error handling middleware ---------------:
 app.use((error, req, res, next) => {
+  console.log('an error was caught in the global error handling middleware')
   if (error.isOperational) {
     console.log('operational error!')
     sendRes(error.statusCode, res, { ...error })
-  } else sendRes(400, res, error)
+  } else sendRes(error.statusCode || 400, res, error)
 })
 
 console.clear()

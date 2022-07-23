@@ -38,7 +38,7 @@ const getOneById = (Model, id, options) =>
         return await chosenOptions.pre(query)
       },
       {
-        notFoundErr: false,
+        // notFoundErr: false,
       }
     )
     if (!doc && chosenOptions.notFoundErr) {

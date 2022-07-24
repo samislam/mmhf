@@ -160,7 +160,12 @@ Create one document using the `dataObj` argument, and send the response.
 - **options**: _object_ | _function_
   - When a function is provided, it will be called with the express **req** object as the first parameter.
   - If a function is provided, it must return an object.
-  - see the options available in the **available options** section.
+
+### Available options:
+
+- **pre:** *function*, a function (a hook) to execute _before_ querying the database, this function gets called with the Mongoose **query** object.
+- **post:** _function_, a function (a hook) to execute _after_ querying the database and _after_ verifying the database response, this function gets called with the database response.
+- see the options available in the **available options** section.
 
 ---
 
@@ -189,6 +194,9 @@ Get multiple documents, search for them using the `filterObj` argument, and send
 ### Available options:
 
 - **projection:**: (defaults to `null`) the mongoose findOne method arguemnt, optional fields to return, read more [here](https://mongoosejs.com/docs/api/model.html#model_Model.find).
+
+- **pre:** *function*, a function (a hook) to execute _before_ querying the database, this function gets called with the Mongoose **query** object.
+- **post:** _function_, a function (a hook) to execute _after_ querying the database and _after_ verifying the database response, this function gets called with the database response.
 - for other options, read the options available in the **available options** section.
 
 # `getOne(Model: MongooseModel | function, filterObj: object | function, options: object | function)`

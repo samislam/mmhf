@@ -41,7 +41,7 @@
     "express-async-handler": "^1.2.0",
     "lodash": "^4.17.21",
     "mongoose": "^6.4.3",
-    "setdoc": "^2.0.0",
+    "setdoc": "^3.0.1",
     "traverse": "^0.6.6",
     "uniqid": "^5.4.0"
   },

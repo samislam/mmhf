@@ -5,9 +5,9 @@ const expressAsyncHandler = require('express-async-handler')
 const _ = require('lodash')
 const { sendRes } = require('@samislam/sendres')
 const { setDoc } = require('setdoc')
-const getValue = require('../../utils/getValue')
-const { sharedDefaultOptions, oneStuffDefaultOptions } = require('../../utils/defaultOptions')
-const NotFoundError = require('../../utils/NotFoundError')
+const getValue = require('../utils/getValue')
+const { sharedDefaultOptions, oneStuffDefaultOptions } = require('../utils/defaultOptions')
+const NotFoundError = require('../utils/NotFoundError')
 /*=====  End of importing dependencies  ======*/
 
 const deleteOneById = (Model, id, options) =>

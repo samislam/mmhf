@@ -29,9 +29,9 @@ const createOne = (Model, dataObj, options) =>
 
     let doc = await setDoc(async () => {
       const query = ModelValue.create(dataObjValue)
-      return await chosenOptions.pre(query)
+      return (await chosenOptions.pre(query)) || query
     })
-    doc = await chosenOptions.post(doc)
+    doc = (await chosenOptions.post(doc)) || doc
     // sending the response ---------------
     sendRes(chosenOptions.statusCode, res, { data: doc }, chosenOptions.sendRes)
     if (chosenOptions.callNext) next()

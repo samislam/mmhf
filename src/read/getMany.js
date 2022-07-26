@@ -32,10 +32,10 @@ const getMany = (Model, filterObj = {}, options) =>
     let docs = await setDoc(async () => {
       // running the pre-query hook ---------------
       const query = ModelValue.find(filterObjValue, chosenOptions.projection, chosenOptions.queryOptions)
-      return await chosenOptions.pre(query)
+      return (await chosenOptions.pre(query)) || query
     })
     // running the post-query hook ---------------
-    docs = await chosenOptions.post(docs)
+    docs = (await chosenOptions.post(docs)) || docs
     // sending the response ---------------
     sendRes(chosenOptions.statusCode, res, { $$data: docs }, chosenOptions.sendRes)
     if (chosenOptions.callNext) next()

@@ -38,7 +38,7 @@ const updateOneByIdWithSave = (Model, id, updateObj, options) =>
       async () => {
         // running the pre-query hook ---------------
         const query = ModelValue.findById(idValue, chosenOptions.projection, chosenOptions.queryOptions)
-        return await chosenOptions.pre(query)
+        return (await chosenOptions.pre(query)) || query
       },
       {
         notFoundErr: false,
@@ -50,7 +50,7 @@ const updateOneByIdWithSave = (Model, id, updateObj, options) =>
     }
     doc = await setDoc(async () => saveUpdate(doc, updateObjValue, chosenOptions.saveQueryOptions))
     // running the post-query hook ---------------
-    doc = await chosenOptions.post(doc)
+    doc = (await chosenOptions.post(doc)) || doc
     // sending the response ---------------
     sendRes(chosenOptions.statusCode, res, { data: doc }, chosenOptions.sendRes)
     if (chosenOptions.callNext) next()

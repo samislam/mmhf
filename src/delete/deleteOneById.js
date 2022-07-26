@@ -35,7 +35,7 @@ const deleteOneById = (Model, id, options) =>
       async () => {
         // running the pre-query hook ---------------
         const query = ModelValue.findByIdAndDelete(idValue, chosenOptions.queryOptions)
-        return await chosenOptions.pre(query)
+        return (await chosenOptions.pre(query)) || query
       },
       {
         notFoundErr: false,
@@ -46,7 +46,7 @@ const deleteOneById = (Model, id, options) =>
       else return next(new NotFoundError(chosenOptions.notFoundMsg, chosenOptions.notFoundStatusCode))
     }
     // running the post-query hook ---------------
-    doc = await chosenOptions.post(doc)
+    doc = (await chosenOptions.post(doc)) || doc
     // sending the response ---------------
     sendRes(chosenOptions.statusCode, res, { data: chosenOptions.sendDeletedDoc ? doc : null }, chosenOptions.sendRes)
     if (chosenOptions.callNext) next()

@@ -1,56 +1,54 @@
 /*=============================================
 =            importing dependencies            =
 =============================================*/
-const expressAsyncHandler = require('express-async-handler')
 const _ = require('lodash')
-const { sendRes } = require('@samislam/sendres')
-const { setDoc } = require('setdoc')
+const { sendDocMw } = require('setdoc')
 const getValue = require('../utils/getValue')
-const { sharedDefaultOptions, oneStuffDefaultOptions } = require('../utils/defaultOptions')
-const NotFoundError = require('../utils/NotFoundError')
+const switcher = require('@samislam/switcher')
+const getChosenOptions = require('../utils/getChosenOptions')
 /*=====  End of importing dependencies  ======*/
 
 const deleteOne = (Model, filterObj, options) =>
-  expressAsyncHandler(async (req, res, next) => {
-    // @param Model: MongooseModel | function
-    // @param filterObj: object | function
-    // @param options: object | function
+  // @param Model: MongooseModel | function
+  // @param filterObj: object | function
+  // @param options: object | function
+  switcher(async (req) => {
     // getting the parameters values ---------------
     const ModelValue = await getValue(Model, req)
     const filterObjValue = await getValue(filterObj, req)
     const optionsValue = await getValue(options, req)
-    // working with the options ---------------
-    const chosenOptions = {}
-    const defaultOptions = {
-      ...sharedDefaultOptions,
-      ...oneStuffDefaultOptions,
-      queryOptions: {},
-      statusCode: 204,
-      sendDeletedDoc: false,
-    }
-    _.merge(chosenOptions, defaultOptions, optionsValue)
-
-    // querying the database ---------------
-    let doc = setDoc(
-      async () => {
-        // running the pre-query hook ---------------
-        const query = ModelValue.findOneAndDelete(filterObjValue, chosenOptions.queryOptions)
-        return (await chosenOptions.pre(query)) || query
-      },
+    const chosenOptions = getChosenOptions(
       {
-        notFoundErr: false,
-      }
+        statusCode: 204,
+        queryOptions: undefined,
+        sendDeletedDoc: false,
+        post(doc) {
+          return this.sendArchivedDoc ? doc : null
+        },
+      },
+      optionsValue
     )
-    if (!doc && chosenOptions.notFoundErr) {
-      if (chosenOptions.handleNotFoundErr) return sendRes(chosenOptions.notFoundStatusCode, res, { message: chosenOptions.notFoundMsg })
-      else return next(new NotFoundError(chosenOptions.notFoundMsg, chosenOptions.notFoundStatusCode))
-    }
-    // running the post-query hook ---------------
-    doc = (await chosenOptions.post(doc)) || doc
-    // sending the response ---------------
-    sendRes(chosenOptions.statusCode, res, { data: chosenOptions.sendDeletedDoc ? doc : null }, chosenOptions.sendRes)
-    if (chosenOptions.callNext) next()
+    return sendDocMw(
+      () => ModelValue.findOneAndDelete(filterObjValue, chosenOptions.queryOptions),
+      _.omit(chosenOptions, ['queryOptions', 'sendDeletedDoc'])
+    )
   })
 
 /*----------  end of code, exporting  ----------*/
 module.exports = deleteOne
+
+// options
+// pre: undefined,
+// post(doc) {
+//   return this.sendArchivedDoc ? doc : null
+// },
+// statusCode: 204,
+// sendDeletedDoc: false,
+// resBody: undefined,
+// sendRes: undefined,
+// callNext: undefined,
+// notFoundMsg: undefined,
+// notFoundErr: undefined,
+// queryOptions: undefined,
+// handleNotFoundErr: undefined,
+// notFoundStatusCode: undefined,

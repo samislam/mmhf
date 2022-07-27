@@ -1,58 +1,50 @@
 /*=============================================
 =            importing dependencies            =
 =============================================*/
-const expressAsyncHandler = require('express-async-handler')
 const _ = require('lodash')
-const { sendRes } = require('@samislam/sendres')
-const { setDoc } = require('setdoc')
+const { sendDocMw } = require('setdoc')
 const getValue = require('../utils/getValue')
-const { sharedDefaultOptions, oneStuffDefaultOptions } = require('../utils/defaultOptions')
-const NotFoundError = require('../utils/NotFoundError')
+const switcher = require('@samislam/switcher')
+const getChosenOptions = require('setdoc/src/utils/getChosenOptions')
 /*=====  End of importing dependencies  ======*/
 
 const updateOneById = (Model, id, updateObj, options) =>
-  expressAsyncHandler(async (req, res, next) => {
-    // @param Model: MongooseModel | function
-    // @param id: ObjectId | string | function
-    // @param updateObj: object | function
-    // @param options: object | function
+  // @param Model: MongooseModel | function
+  // @param id: ObjectId | string | function
+  // @param updateObj: object | function
+  // @param options: object | function
+  switcher(async (req) => {
     // getting the parameters values ---------------
     const ModelValue = await getValue(Model, req)
     const idValue = await getValue(id, req)
     const updateObjValue = await getValue(updateObj, req)
     const optionsValue = await getValue(options, req)
-    // working with the options ---------------
-    const chosenOptions = {}
-    const defaultOptions = {
-      ...sharedDefaultOptions,
-      ...oneStuffDefaultOptions,
-      queryOptions: { new: true, runValidators: true },
-      statusCode: 200,
-    }
-    _.merge(chosenOptions, defaultOptions, optionsValue)
-
-    // querying the database ---------------
-    let doc = await setDoc(
-      async () => {
-        // running the pre-query hook ---------------
-        const query = ModelValue.findByIdAndUpdate(idValue, updateObjValue, chosenOptions.queryOptions)
-        return (await chosenOptions.pre(query)) || query
-      },
+    const chosenOptions = getChosenOptions(
       {
-        notFoundErr: false,
-      }
+        queryOptions: { new: true, runValidators: true },
+        statusCode: 200,
+      },
+      optionsValue
     )
-    if (!doc && chosenOptions.notFoundErr) {
-      if (chosenOptions.handleNotFoundErr) return sendRes(chosenOptions.notFoundStatusCode, res, { message: chosenOptions.notFoundMsg })
-      else return next(new NotFoundError(chosenOptions.notFoundMsg, chosenOptions.notFoundStatusCode))
-    }
-    // running the post-query hook ---------------
-    doc = (await chosenOptions.post(doc)) || doc
-    // sending the response ---------------
-    sendRes(chosenOptions.statusCode, res, { data: doc }, chosenOptions.sendRes)
-    if (chosenOptions.callNext) next()
+    return sendDocMw(
+      () => ModelValue.findByIdAndUpdate(idValue, updateObjValue, chosenOptions.queryOptions),
+      _.omit(chosenOptions, ['queryOptions'])
+    )
   })
 
 /*----------  end of code, exporting  ----------*/
 
 module.exports = updateOneById
+
+// options
+// pre: undefined,
+// post: undefined,
+// statusCode: 200,
+// resBody: undefined,
+// sendRes: undefined,
+// callNext: undefined,
+// notFoundMsg: undefined,
+// notFoundErr: undefined,
+// handleNotFoundErr: undefined,
+// notFoundStatusCode: undefined,
+// queryOptions: { new: true, runValidators: true },

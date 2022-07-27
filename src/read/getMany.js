@@ -1,45 +1,45 @@
 /*=============================================
 =            importing dependencies            =
 =============================================*/
-const expressAsyncHandler = require('express-async-handler')
 const _ = require('lodash')
-const { sendRes } = require('@samislam/sendres')
-const { setDoc } = require('setdoc')
+const { sendDocMw } = require('setdoc')
 const getValue = require('../utils/getValue')
-const { sharedDefaultOptions } = require('../utils/defaultOptions')
+const switcher = require('@samislam/switcher')
+const getChosenOptions = require('../utils/getChosenOptions')
 /*=====  End of importing dependencies  ======*/
 
 const getMany = (Model, filterObj = {}, options) =>
-  expressAsyncHandler(async (req, res, next) => {
-    // @param Model: MongooseModel | function
-    // @param filterObj: object | function
-    // @param options: object | function
+  // @param Model: MongooseModel | function
+  // @param filterObj: object | function
+  // @param options: object | function
+  switcher(async (req) => {
     // getting the parameters values ---------------
     const ModelValue = await getValue(Model, req)
     const filterObjValue = await getValue(filterObj, req)
     const optionsValue = await getValue(options, req)
-    // working with the options ---------------
-    const chosenOptions = {}
-    const defaultOptions = {
-      ...sharedDefaultOptions,
-      queryOptions: {},
-      statusCode: 200,
-      projection: null,
-    }
-    _.merge(chosenOptions, defaultOptions, optionsValue)
-
-    // querying the database ---------------
-    let docs = await setDoc(async () => {
-      // running the pre-query hook ---------------
-      const query = ModelValue.find(filterObjValue, chosenOptions.projection, chosenOptions.queryOptions)
-      return (await chosenOptions.pre(query)) || query
-    })
-    // running the post-query hook ---------------
-    docs = (await chosenOptions.post(docs)) || docs
-    // sending the response ---------------
-    sendRes(chosenOptions.statusCode, res, { $$data: docs }, chosenOptions.sendRes)
-    if (chosenOptions.callNext) next()
+    const chosenOptions = getChosenOptions(
+      {
+        statusCode: 200,
+        projection: null,
+        queryOptions: undefined,
+      },
+      optionsValue
+    )
+    return sendDocMw(
+      () => ModelValue.find(filterObjValue, chosenOptions.projection, chosenOptions.queryOptions),
+      _.omit(chosenOptions, ['projection', 'queryOptions'])
+    )
   })
 
 /*----------  end of code, exporting  ----------*/
 module.exports = getMany
+
+// options
+// pre: undefined,
+// statusCode: 200,
+// post: undefined,
+// projection: null,
+// resBody: undefined,
+// sendRes: undefined,
+// callNext: undefined,
+// queryOptions: undefined,

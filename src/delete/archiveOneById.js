@@ -1,67 +1,59 @@
 /*=============================================
 =            importing dependencies            =
 =============================================*/
-const expressAsyncHandler = require('express-async-handler')
 const _ = require('lodash')
-const { sendRes } = require('@samislam/sendres')
-const { setDoc } = require('setdoc')
+const { sendDocMw } = require('setdoc')
 const getValue = require('../utils/getValue')
 const archiveDoc = require('../utils/archiveDoc')
-const { sharedDefaultOptions, oneStuffDefaultOptions } = require('../utils/defaultOptions')
-const NotFoundError = require('../utils/NotFoundError')
+const switcher = require('@samislam/switcher')
+const getChosenOptions = require('../utils/getChosenOptions')
 /*=====  End of importing dependencies  ======*/
 
 const archiveOneById = (Model, id, options) =>
-  expressAsyncHandler(async (req, res, next) => {
-    // @param Model: MongooseModel | function
-    // @param id: ObjectId | string | function
-    // @param options: object | function
+  // @param Model: MongooseModel | function
+  // @param id: ObjectId | string | function
+  // @param options: object | function
+  switcher(async (req) => {
     // getting the parameters values ---------------
     const ModelValue = await getValue(Model, req)
     const idValue = await getValue(id, req)
     const optionsValue = await getValue(options, req)
-    // working with the options ---------------
-    const chosenOptions = {}
-    const defaultOptions = {
-      ...sharedDefaultOptions,
-      ...oneStuffDefaultOptions,
-      queryOptions: {},
-      statusCode: 204,
-      sendArchivedDoc: false,
-      uniqueId: undefined,
-      uniqueFields: undefined,
-    }
-    _.merge(chosenOptions, defaultOptions, optionsValue)
-
-    // querying the database ---------------
-    let doc = await setDoc(
-      async () => {
-        // running the pre-query hook ---------------
-        const query = archiveDoc(
-          ModelValue,
-          { _id: idValue },
-          {
-            queryOptions: chosenOptions.queryOptions,
-            uniqueId: chosenOptions.uniqueId,
-            uniqueFields: chosenOptions.uniqueFields,
-          }
-        )
-        return (await chosenOptions.pre(query)) || query
-      },
+    const chosenOptions = getChosenOptions(
       {
-        notFoundErr: false,
-      }
+        statusCode: 204,
+        sendArchivedDoc: false,
+        queryOptions: undefined,
+        post(doc) {
+          return this.sendArchivedDoc ? doc : null
+        },
+      },
+      optionsValue
     )
-    if (!doc && chosenOptions.notFoundErr) {
-      if (chosenOptions.handleNotFoundErr) return sendRes(chosenOptions.notFoundStatusCode, res, { message: chosenOptions.notFoundMsg })
-      else return next(new NotFoundError(chosenOptions.notFoundMsg, chosenOptions.notFoundStatusCode))
-    }
-    // running the post-query hook ---------------
-    doc = (await chosenOptions.post(doc)) || doc
-    // sending the response ---------------
-    sendRes(chosenOptions.statusCode, res, { data: chosenOptions.sendArchivedDoc ? doc : null }, chosenOptions.sendRes)
-    if (chosenOptions.callNext) next()
+    return sendDocMw(
+      () =>
+        archiveDoc(ModelValue, { _id: idValue }, _.omit(chosenOptions, ['queryOptions', 'sendArchivedDoc', 'uniqueId', 'uniqueFields'])),
+      _.omit(chosenOptions, ['queryOptions', 'sendArchivedDoc', 'uniqueId', 'uniqueFields'])
+    )
   })
 
 /*----------  end of code, exporting  ----------*/
+
 module.exports = archiveOneById
+
+// options
+// pre: undefined,
+// post(doc) {
+//   return this.sendArchivedDoc ? doc : null
+// },
+// statusCode: 204,
+// resBody: undefined,
+// sendRes: undefined,
+// callNext: undefined,
+// uniqueId: undefined,
+// sendArchivedDoc: false,
+// notFoundMsg: undefined,
+// notFoundErr: undefined,
+// uniqueFields: undefined,
+// queryOptions: undefined,
+// handleNotFoundErr: undefined,
+// notFoundStatusCode: undefined,

@@ -24,13 +24,15 @@ const updateOne = (Model, filterObj, updateObj, options) =>
       {
         queryOptions: { new: true, runValidators: true },
         statusCode: 200,
+        chain: (query) => query,
       },
       optionsValue
     )
-    return sendDocMw(
-      () => ModelValue.findOneAndUpdate(filterObjValue, updateObjValue, chosenOptions.queryOptions),
-      _.omit(chosenOptions, ['queryOptions'])
-    )
+    return sendDocMw(() => {
+      let query = ModelValue.findOneAndUpdate(filterObjValue, updateObjValue, chosenOptions.queryOptions)
+      query = chosenOptions.chain(query)
+      return query
+    }, _.omit(chosenOptions, ['queryOptions']))
   })
 
 /*----------  end of code, exporting  ----------*/
@@ -38,14 +40,13 @@ const updateOne = (Model, filterObj, updateObj, options) =>
 module.exports = updateOne
 
 // options
-// pre: undefined,
-// post: undefined,
 // statusCode: 200,
 // resBody: undefined,
 // sendRes: undefined,
 // callNext: undefined,
 // notFoundMsg: undefined,
 // notFoundErr: undefined,
+// chain: (query) => query,
 // handleNotFoundErr: undefined,
 // notFoundStatusCode: undefined,
 // queryOptions: { new: true, runValidators: true },

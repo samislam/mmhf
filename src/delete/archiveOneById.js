@@ -23,17 +23,18 @@ const archiveOneById = (Model, id, options) =>
         statusCode: 204,
         sendArchivedDoc: false,
         queryOptions: undefined,
-        post(doc) {
-          return this.sendArchivedDoc ? doc : null
-        },
+        chain: (query) => query,
       },
       optionsValue
     )
-    return sendDocMw(
-      () =>
-        archiveDoc(ModelValue, { _id: idValue }, _.omit(chosenOptions, ['queryOptions', 'sendArchivedDoc', 'uniqueId', 'uniqueFields'])),
-      _.omit(chosenOptions, ['queryOptions', 'sendArchivedDoc', 'uniqueId', 'uniqueFields'])
-    )
+    const defaultResBody = {
+      resBody: (doc) => (chosenOptions.sendArchivedDoc ? { data: doc } : { data: null }),
+    }
+    return sendDocMw(() => {
+      let query = archiveDoc(ModelValue, { _id: idValue }, _.pick(chosenOptions, ['queryOptions', 'uniqueId', 'uniqueFields']))
+      query = chosenOptions.chain(query)
+      return query
+    }, _.omit(Object.assign(defaultResBody, chosenOptions), ['queryOptions', 'sendArchivedDoc', 'uniqueId', 'uniqueFields']))
   })
 
 /*----------  end of code, exporting  ----------*/
@@ -41,10 +42,6 @@ const archiveOneById = (Model, id, options) =>
 module.exports = archiveOneById
 
 // options
-// pre: undefined,
-// post(doc) {
-//   return this.sendArchivedDoc ? doc : null
-// },
 // statusCode: 204,
 // resBody: undefined,
 // sendRes: undefined,
@@ -55,5 +52,6 @@ module.exports = archiveOneById
 // notFoundErr: undefined,
 // uniqueFields: undefined,
 // queryOptions: undefined,
+// chain: (query) => query,
 // handleNotFoundErr: undefined,
 // notFoundStatusCode: undefined,

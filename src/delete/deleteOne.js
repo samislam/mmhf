@@ -22,33 +22,32 @@ const deleteOne = (Model, filterObj, options) =>
         statusCode: 204,
         queryOptions: undefined,
         sendDeletedDoc: false,
-        post(doc) {
-          return this.sendArchivedDoc ? doc : null
-        },
+        chain: (query) => query,
       },
       optionsValue
     )
-    return sendDocMw(
-      () => ModelValue.findOneAndDelete(filterObjValue, chosenOptions.queryOptions),
-      _.omit(chosenOptions, ['queryOptions', 'sendDeletedDoc'])
-    )
+    const defaultResBody = {
+      resBody: (doc) => (chosenOptions.sendDeletedDoc ? { data: doc } : { data: null }),
+    }
+    return sendDocMw(() => {
+      let query = ModelValue.findOneAndDelete(filterObjValue, chosenOptions.queryOptions)
+      query = chosenOptions.chain(query)
+      return query
+    }, _.omit(Object.assign(defaultResBody, chosenOptions), ['queryOptions', 'sendDeletedDoc']))
   })
 
 /*----------  end of code, exporting  ----------*/
 module.exports = deleteOne
 
 // options
-// pre: undefined,
-// post(doc) {
-//   return this.sendArchivedDoc ? doc : null
-// },
 // statusCode: 204,
-// sendDeletedDoc: false,
-// resBody: undefined,
 // sendRes: undefined,
+// resBody: undefined,
 // callNext: undefined,
+// sendDeletedDoc: false,
 // notFoundMsg: undefined,
 // notFoundErr: undefined,
+// chain: (query) => query,
 // queryOptions: undefined,
 // handleNotFoundErr: undefined,
 // notFoundStatusCode: undefined,

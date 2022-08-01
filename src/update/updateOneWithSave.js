@@ -2,7 +2,7 @@
 =            importing dependencies            =
 =============================================*/
 const _ = require('lodash')
-const { setDocMw, sendDocMw } = require('setdoc')
+const { sendDocMw } = require('setdoc')
 const getValue = require('../utils/getValue')
 const saveUpdate = require('../utils/saveUpdate')
 const switcher = require('@samislam/switcher')
@@ -26,19 +26,20 @@ const updateOneWithSave = (Model, filterObj, updateObj, options) =>
         queryOptions: undefined,
         saveQueryOptions: undefined,
         statusCode: 200,
+        chain: (query) => query,
       },
       optionsValue
     )
-    return [
-      setDocMw(
-        () => ModelValue.findOne(filterObjValue, chosenOptions.projection, chosenOptions.queryOptions),
-        _.omit(['queryOptions', 'saveQueryOptions', 'post', 'callNext'])
-      ),
-      sendDocMw(
-        () => saveUpdate(req.mainDoc, updateObjValue, chosenOptions.saveQueryOptions),
-        _.omit(['queryOptions', 'saveQueryOptions', 'pre'])
-      ),
-    ]
+    return sendDocMw(() => {
+      let query = ModelValue.findOne(filterObjValue, chosenOptions.projection, chosenOptions.queryOptions).transform(async function (doc) {
+        if (!doc) return
+        const updatedDoc = await saveUpdate(doc, updateObjValue, chosenOptions.saveQueryOptions)
+        return updatedDoc
+      })
+
+      query = chosenOptions.chain(query)
+      return query
+    }, _.omit(chosenOptions, ['queryOptions', 'saveQueryOptions']))
   })
 
 /*----------  end of code, exporting  ----------*/
@@ -46,14 +47,13 @@ const updateOneWithSave = (Model, filterObj, updateObj, options) =>
 module.exports = updateOneWithSave
 
 // options
-// pre: undefined,
-// post: undefined,
 // statusCode: 200,
 // resBody: undefined,
 // sendRes: undefined,
 // callNext: undefined,
 // notFoundMsg: undefined,
 // notFoundErr: undefined,
+// chain: (query) => query,
 // saveQueryOptions: undefined
 // handleNotFoundErr: undefined,
 // notFoundStatusCode: undefined,

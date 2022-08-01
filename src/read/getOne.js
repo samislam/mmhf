@@ -22,21 +22,21 @@ const getOne = (Model, filterObj, options) =>
         statusCode: 200,
         projection: null,
         queryOptions: undefined,
+        chain: (query) => query,
       },
       optionsValue
     )
-    return sendDocMw(
-      () => ModelValue.findOne(filterObjValue, chosenOptions.projection, chosenOptions.queryOptions),
-      _.omit(chosenOptions, ['projection', 'queryOptions'])
-    )
+    return sendDocMw(() => {
+      let query = ModelValue.findOne(filterObjValue, chosenOptions.projection, chosenOptions.queryOptions)
+      query = chosenOptions.chain(query)
+      return query
+    }, _.omit(chosenOptions, ['projection', 'queryOptions']))
   })
 
 /*----------  end of code, exporting  ----------*/
 module.exports = getOne
 
 // options
-// pre: undefined,
-// post: undefined,
 // statusCode: 200,
 // projection: null,
 // resBody: undefined,
@@ -45,5 +45,6 @@ module.exports = getOne
 // notFoundMsg: undefined,
 // notFoundErr: undefined,
 // queryOptions: undefined,
+// chain: (query) => query,
 // handleNotFoundErr: undefined,
 // notFoundStatusCode: undefined,

@@ -22,13 +22,15 @@ const getOneById = (Model, id, options) =>
         statusCode: 200,
         projection: null,
         queryOptions: undefined,
+        chain: (query) => query,
       },
       optionsValue
     )
-    return sendDocMw(
-      () => ModelValue.findById(idValue, chosenOptions.projection, chosenOptions.queryOptions),
-      _.omit(chosenOptions, ['projection', 'queryOptions'])
-    )
+    return sendDocMw(() => {
+      let query = ModelValue.findById(idValue, chosenOptions.projection, chosenOptions.queryOptions)
+      query = chosenOptions.chain(query)
+      return query
+    }, _.omit(chosenOptions, ['projection', 'queryOptions']))
   })
 
 /*----------  end of code, exporting  ----------*/
@@ -36,8 +38,6 @@ const getOneById = (Model, id, options) =>
 module.exports = getOneById
 
 // options
-// pre: undefined,
-// post: undefined,
 // statusCode: 200,
 // projection: null,
 // resBody: undefined,
@@ -46,5 +46,6 @@ module.exports = getOneById
 // notFoundMsg: undefined,
 // notFoundErr: undefined,
 // queryOptions: undefined,
+// chain: (query) => query,
 // handleNotFoundErr: undefined,
 // notFoundStatusCode: undefined,

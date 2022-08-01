@@ -25,19 +25,20 @@ const updateOneByIdWithSave = (Model, id, updateObj, options) =>
         statusCode: 200,
         queryOptions: undefined,
         saveQueryOptions: undefined,
+        chain: (query) => query,
       },
       optionsValue
     )
-    return [
-      setDocMw(
-        () => ModelValue.findById(idValue, chosenOptions.projection, chosenOptions.queryOptions),
-        _.omit(['queryOptions', 'saveQueryOptions', 'post', 'callNext'])
-      ),
-      sendDocMw(
-        () => saveUpdate(req.mainDoc, updateObjValue, chosenOptions.saveQueryOptions),
-        _.omit(['queryOptions', 'saveQueryOptions', 'pre'])
-      ),
-    ]
+
+    return sendDocMw(() => {
+      let query = ModelValue.findById(idValue, chosenOptions.projection, chosenOptions.queryOptions).transform(async function (doc) {
+        if (!doc) return
+        const updatedDoc = await saveUpdate(doc, updateObjValue, chosenOptions.saveQueryOptions)
+        return updatedDoc
+      })
+      query = chosenOptions.chain(query)
+      return query
+    }, _.omit(chosenOptions, ['queryOptions', 'saveQueryOptions']))
   })
 
 /*----------  end of code exporting  ----------*/
@@ -45,14 +46,13 @@ const updateOneByIdWithSave = (Model, id, updateObj, options) =>
 module.exports = updateOneByIdWithSave
 
 // options
-// pre: undefined,
-// post: undefined,
 // statusCode: 200,
 // resBody: undefined,
 // sendRes: undefined,
 // callNext: undefined,
 // notFoundMsg: undefined,
 // notFoundErr: undefined,
+// chain: (query) => query,
 // saveQueryOptions: undefined
 // handleNotFoundErr: undefined,
 // notFoundStatusCode: undefined,

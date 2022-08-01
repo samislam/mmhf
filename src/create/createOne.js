@@ -21,10 +21,11 @@ const createOne = (Model, dataObj, options) =>
       {
         statusCode: 201,
         queryOptions: undefined,
+        resBody: (doc) => ({ data: doc[0] }),
       },
       optionsValue
     )
-    return sendDocMw(() => ModelValue.create([dataObjValue], chosenOptions.queryOptions), _.omit(chosenOptions, 'queryOptions'))
+    return sendDocMw(() => ModelValue.create([dataObjValue], chosenOptions.queryOptions), _.omit(chosenOptions, ['queryOptions']))
   })
 
 /*----------  end of code, exporting  ----------*/
@@ -32,9 +33,7 @@ const createOne = (Model, dataObj, options) =>
 module.exports = createOne
 
 // options
-// pre: undefined,
 // statusCode: 201,
-// post: undefined,
 // resBody: undefined,
 // sendRes: undefined,
 // callNext: undefined,

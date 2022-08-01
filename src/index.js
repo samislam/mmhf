@@ -7,7 +7,7 @@ const getOneById = require('./read/getOneById')
 // [U]pdate middlewares
 const updateOne = require('./update/updateOne')
 const updateOneById = require('./update/updateOneById')
-const updateOneWithSave = require('./update/updateOneByIdWithSave')
+const updateOneWithSave = require('./update/updateOneWithSave')
 const updateOneByIdWithSave = require('./update/updateOneByIdWithSave')
 // [D]elete middlewares
 const deleteOne = require('./delete/deleteOne')

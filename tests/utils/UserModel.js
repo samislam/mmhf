@@ -17,6 +17,7 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: [true, 'a user must have a name'],
   },
+  age: Number,
   loginAttempts: [loginAttempt],
   permissions: {
     nestedName: String,
@@ -25,10 +26,24 @@ const userSchema = new mongoose.Schema({
   subscribers: [{ email: String, name: String }],
 })
 
+userSchema.pre(/^find/, function (next) {
+  console.log('pre find hook of schema ran!')
+  const query = this
+  query.findOne({ _archived: { $exists: false } }, null, { strictQuery: false })
+  next()
+})
+
+userSchema.post(/^find/, function () {
+  console.log('post find hook of schema ran!')
+  const doc = this
+})
+
+userSchema.pre('save', function (next) {
+  console.log('pre save hook was ran in the schema')
+  next()
+})
+
 const UserModel = mongoose.model('User', userSchema, 'users')
 
 /*----------  end of code, exporting  ----------*/
-module.exports = {
-  userSchema,
-  UserModel,
-}
+module.exports = UserModel

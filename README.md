@@ -163,8 +163,6 @@ Create one document using the `dataObj` argument, and send the response.
 
 ### Available options:
 
-- **pre:** *function*, a function (a hook) to execute _before_ querying the database, this function gets called with the Mongoose **query** object.
-- **post:** _function_, a function (a hook) to execute _after_ querying the database and _after_ verifying the database response, this function gets called with the database response.
 - see the options available in the **available options** section.
 
 ---
@@ -194,9 +192,6 @@ Get multiple documents, search for them using the `filterObj` argument, and send
 ### Available options:
 
 - **projection:**: (defaults to `null`) the mongoose findOne method arguemnt, optional fields to return, read more [here](https://mongoosejs.com/docs/api/model.html#model_Model.find).
-
-- **pre:** *function*, a function (a hook) to execute _before_ querying the database, this function gets called with the Mongoose **query** object.
-- **post:** _function_, a function (a hook) to execute _after_ querying the database and _after_ verifying the database response, this function gets called with the database response.
 - for other options, read the options available in the **available options** section.
 
 # `getOne(Model: MongooseModel | function, filterObj: object | function, options: object | function)`
@@ -221,8 +216,6 @@ Get one document, search for it using the `filterObj` argument, and send the res
 ### Available options:
 
 - **projection:** (defaults to `null`) the mongoose findOne method arguemnt, optional fields to return, read more [here](https://mongoosejs.com/docs/api/model.html#model_Model.find).
-- **pre:** *function*, a function (a hook) to execute _before_ querying the database, this function gets called with the Mongoose **query** object.
-- **post:** _function_, a function (a hook) to execute _after_ querying the database and _after_ verifying the database response, this function gets called with the database response.
 - for other options, read the options available in the **available options** section.
 
 # `getOneById(Model: MongooseModel | function, id: ObjectId | string | function, options: object | function)`
@@ -247,8 +240,6 @@ Get one document, search for it by its ID, and send the response.
 ### Available options:
 
 - **projection:**: (defaults to `null`) the mongoose findOne method arguemnt, optional fields to return, read more [here](https://mongoosejs.com/docs/api/model.html#model_Model.find).
-- **pre:** *function*, a function (a hook) to execute _before_ querying the database, this function gets called with the Mongoose **query** object.
-- **post:** _function_, a function (a hook) to execute _after_ querying the database and _after_ verifying the database response, this function gets called with the database response.
 - for other options, read the options available in the **available options** section.
 
 ---
@@ -280,8 +271,6 @@ Update one document, search for it using the `filterObj` argument, update the sp
 ### Available options:
 
 - **queryOptions:** uses `{ new: true, runValidators: true }` internally by default.
-- **pre:** *function*, a function (a hook) to execute _before_ querying the database, this function gets called with the Mongoose **query** object.
-- **post:** _function_, a function (a hook) to execute _after_ querying the database and _after_ verifying the database response, this function gets called with the database response.
 - for other options, read the options available in the **available options** section.
 
 # `updateOneById(Model: MongooseModel | function, id: ObjectId | string | function, updateObj: object | function, options: object | function)`
@@ -309,8 +298,6 @@ Update one document, search for it using the by its ID, update the specified fie
 ### Available options:
 
 - **queryOptions:** uses `{ new: true, runValidators: true }` internally by default.
-- **pre:** *function*, a function (a hook) to execute _before_ querying the database, this function gets called with the Mongoose **query** object.
-- **post:** _function_, a function (a hook) to execute _after_ querying the database and _after_ verifying the database response, this function gets called with the database response.
 - for other options, read the options available in the **available options** section.
 
 # `updateOneWithSave(Model: MongooseModel | function, filterObj: object | function, updateObj: object | function, options: object | function)`
@@ -339,8 +326,6 @@ This method has the benefit of running the Mongoose `'save'` hooks/middlewares, 
 ### Available options:
 
 - **saveQueryOptions:** options you want to pass to the Mongoose `Document.save()` method, see the official [Mongoose .save() method docs](https://mongoosejs.com/docs/api/document.html#document_Document-save) for these options.
-- **pre:** *function*, a function (a hook) to execute _before_ querying the database, this function gets called with the Mongoose **query** object, it happens before getting the response from the database caused by the `findOne()` method.
-- **post:** _function_, a function (a hook) to execute _after_ querying the database and _after_ verifying the database response, this function gets called with the database response. This hook gets called _after_ saving the document into the database using the `.save()` method, thus, <ins>it gets called with the updated document</ins>.
 - for other options, read the options available in the **available options** section.
 
 # `updateOneByIdWithSave(Model: MongooseModel | function, id: ObjectId | string | function, updateObj: object | function, options: object | function)`
@@ -369,8 +354,6 @@ This method has the benefit of running the Mongoose `'save'` hooks/middlewares, 
 ### Available options:
 
 - **saveQueryOptions:** options you want to pass to the Mongoose `Document.save()` method, see the official [Mongoose .save() method docs](https://mongoosejs.com/docs/api/document.html#document_Document-save) for these options.
-- **pre:** *function*, a function (a hook) to execute _before_ querying the database, this function gets called with the Mongoose **query** object, it happens before getting the response from the database caused by the `findOne()` method.
-- **post:** _function_, a function (a hook) to execute _after_ querying the database and _after_ verifying the database response, this function gets called with the database response. This hook gets called _after_ saving the document into the database using the `.save()` method, thus, <ins>it gets called with the updated document</ins>.
 - for other options, read the options available in the **available options** section.
 
 ---
@@ -400,8 +383,6 @@ Delete one document, search for it using the `filterObj` argument, and send the 
 
 - **sendDeletedDoc:** _boolean_, (default **false**) send the document which got deleted with the response.
   - **Note:** since the default status code is **204**, you're most likely not going to see the body of the response on the client-side, (for example when you're using [PostMan](https://www.postman.com/)).
-- **pre:** *function*, a function (a hook) to execute _before_ querying the database, this function gets called with the Mongoose **query** object.
-- **post:** _function_, a function (a hook) to execute _after_ querying the database and _after_ verifying the database response, this function gets called with the database response.
 - for other options, read the options available in the **available options** section.
 
 # `deleteOneById(Model: MongooseModel | function, id: ObjectId | string | function, options: object | function)`
@@ -427,8 +408,6 @@ Delete one document, search for it by its ID, and send the response.
 
 - **sendDeletedDoc:** _boolean_, (default **false**) send the document which got deleted with the response.
   - **Note:** since the default status code is **204**, you're most likely not going to see the body of the response on the client-side, (for example when you're using [PostMan](https://www.postman.com/)).
-- **pre:** *function*, a function (a hook) to execute _before_ querying the database, this function gets called with the Mongoose **query** object.
-- **post:** _function_, a function (a hook) to execute _after_ querying the database and _after_ verifying the database response, this function gets called with the database response.
 - for other options, read the options available in the **available options** section.
 
 # `archiveOne(Model: MongooseModel | function, filterObj: object | function, options: object | function)`
@@ -460,6 +439,7 @@ sendRes: {}, // default value
 queryOptions: {}, // default value
 callNext: false, // default value
 statusCode,
+resBody, // if array { $$data: doc } else { data: doc }
 ```
 
 - **sendRes**: _object_, the options you want to pass to the [sendRes](https://www.npmjs.com/package/@samislam/sendres) module, mmhf defaults to the default configurations of [sendRes](https://www.npmjs.com/package/@samislam/sendres), if you want to configure how your response styles, use this property.
@@ -468,6 +448,7 @@ statusCode,
 - **callNext**: _boolean_, If you have an express middleware that you want to execute after running one of the middlewares, use this option to make the middleware you're using call the express `next()` function internally.
   - **Note:** even if this option was set to **true**, the response will be sent, either way, **and you can't send a response twice**.
 - **statusCode**: _number_, the success status code, refer to the API section to know the default success status code for each middleware.
+- **resBody**: the response body, what you pass here goes directly to the [sendRes package](https://www.npmjs.com/package/@samislam/sendres).
 
 all the middlewares **except** \[createOne(), getMany()\] uses the following options:
 
@@ -483,6 +464,14 @@ handleNotFoundErr: true
   - of course, this option will only have an effect if the **notFoundErr** option was **true**.
 - **notFoundStatusCode:** the status code to include in the error (default 404).
 - **handleNotFoundErr:** send the response automatically (default: true), if you disable that, you must handle the not found errors in an [express error handling middleware](https://expressjs.com/en/guide/error-handling.html), the error name is always: '_factoryNotFoundError_'.
+
+all the middlewares **except** `createOne()` uses the following options:
+
+```js
+chain: (query) => query
+```
+
+- **chain**: gets called with the mongoose query as the first argument, here you can hang mongoose methods like `.sort()`, `.select()`, `.transform()`, `.pre()` ...etc.
 
 For more options, refer to each middleware in the API above to see if any other options are available per each middleware.
 

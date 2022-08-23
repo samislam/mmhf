@@ -15,12 +15,12 @@ const updateOneWithSave = (Model, filterObj, updateObj, options) =>
   // @param filterObj: object | function
   // @param updateObj: object | function
   // @param options: object | function
-  switcher(async (req) => {
+  switcher(async (req, res, next) => {
     // getting the parameters values ---------------
-    const ModelValue = await getValue(Model, req)
-    const filterObjValue = await getValue(filterObj, req)
-    const updateObjValue = await getValue(updateObj, req)
-    const optionsValue = await getValue(options, req)
+    const ModelValue = await getValue(Model, req, res, next)
+    const filterObjValue = await getValue(filterObj, req, res, next)
+    const updateObjValue = await getValue(updateObj, req, res, next)
+    const optionsValue = await getValue(options, req, res, next)
     const chosenOptions = getChosenOptions(
       {
         queryOptions: undefined,

@@ -12,11 +12,11 @@ const getOne = (Model, filterObj, options) =>
   // @param Model: MongooseModel | function
   // @param filterObj: object | function
   // @param options: object | function
-  switcher(async (req) => {
+  switcher(async (req, res, next) => {
     // getting the parameters values ---------------
-    const ModelValue = await getValue(Model, req)
-    const filterObjValue = await getValue(filterObj, req)
-    const optionsValue = await getValue(options, req)
+    const ModelValue = await getValue(Model, req, res, next)
+    const filterObjValue = await getValue(filterObj, req, res, next)
+    const optionsValue = await getValue(options, req, res, next)
     const chosenOptions = getChosenOptions(
       {
         statusCode: 200,

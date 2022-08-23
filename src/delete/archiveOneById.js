@@ -13,11 +13,11 @@ const archiveOneById = (Model, id, options) =>
   // @param Model: MongooseModel | function
   // @param id: ObjectId | string | function
   // @param options: object | function
-  switcher(async (req) => {
+  switcher(async (req, res, next) => {
     // getting the parameters values ---------------
-    const ModelValue = await getValue(Model, req)
-    const idValue = await getValue(id, req)
-    const optionsValue = await getValue(options, req)
+    const ModelValue = await getValue(Model, req, res, next)
+    const idValue = await getValue(id, req, res, next)
+    const optionsValue = await getValue(options, req, res, next)
     const chosenOptions = getChosenOptions(
       {
         statusCode: 204,

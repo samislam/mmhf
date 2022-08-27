@@ -3,7 +3,7 @@
 =============================================*/
 const _ = require('lodash')
 const getValue = require('../utils/getValue')
-const switcher = require('@samislam/switcher')
+const { switcher } = require('@samislam/switcher')
 const { sendDocMw } = require('setdoc')
 const getChosenOptions = require('../utils/getChosenOptions')
 /*=====  End of importing dependencies  ======*/

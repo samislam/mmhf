@@ -2,7 +2,7 @@
 =            importing dependencies            =
 =============================================*/
 const _ = require('lodash')
-const switcher = require('@samislam/switcher')
+const { switcher } = require('@samislam/switcher')
 const getValue = require('../utils/getValue')
 const { sendDocMw } = require('setdoc')
 const getChosenOptions = require('../utils/getChosenOptions')
